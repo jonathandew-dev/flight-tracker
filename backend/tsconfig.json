@@ -15,6 +15,30 @@
 //   ]
 // }
 
+// {
+//   "compilerOptions": {
+//     "module": "ESNext",
+//     "moduleResolution": "node",
+//     "target": "ES2022",
+//     "strict": true,
+//     "esModuleInterop": true,
+//     "skipLibCheck": true,
+//     "types": ["node","jest"],
+//     "resolveJsonModule": true,
+//     "noImplicitAny": true,
+//     "noImplicitThis": true,
+//     "strictNullChecks": true,
+//     "strictFunctionTypes": true,
+//     "strictBindCallApply": true,
+//     "strictPropertyInitialization": true,
+//     "strictBuiltinIteratorReturn": true,
+//     "alwaysStrict": true,
+//     "useUnknownInCatchVariables": true,
+//     "useDefineForClassFields": true,
+//     "allowSyntheticDefaultImports": true
+//   },
+//   "include": ["src/**/*.ts", "prisma/**/*.ts"]
+// }
 {
   "compilerOptions": {
     "module": "ESNext",
@@ -23,18 +47,8 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node","jest"],
+    "types": ["node", "jest"],
     "resolveJsonModule": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "strictBuiltinIteratorReturn": true,
-    "alwaysStrict": true,
-    "useUnknownInCatchVariables": true,
-    "useDefineForClassFields": true,
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*.ts", "prisma/**/*.ts"]

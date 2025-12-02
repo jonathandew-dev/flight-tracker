@@ -1,7 +1,7 @@
 import 'dotenv/config';
  // src/__tests__/amadeus.test.ts
-import { searchFlights } from "../modules/amadeus/amadeus.service";
-import { FlightOffer } from "../modules/amadeus/amadeus.types";
+import { searchFlights } from "../../modules/amadeus/amadeus.service";
+import { FlightOffer } from "../../modules/amadeus/amadeus.types";
 
 describe("Amadeus service", () => {
   it("fetches flights from JFK to LAX", async () => {

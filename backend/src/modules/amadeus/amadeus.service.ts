@@ -10,10 +10,17 @@ const AMADEUS_BASE_URL = "https://test.api.amadeus.com";
 let accessToken: string | null = null;
 let tokenExpiresAt: number | null = null;
 
-// Get OAuth token
+// --- FlightFilters type ---
+type FlightFilters = {
+  nonStop?: boolean;
+  maxPrice?: number;
+  airlines?: string[];
+};
+
+// --- getAccessToken stays the same ---
 async function getAccessToken(): Promise<string> {
   if (accessToken && tokenExpiresAt && Date.now() < tokenExpiresAt) {
-    return accessToken; // use cached token
+    return accessToken; // <-- this is returned
   }
 
   const response = await axios.post(
@@ -23,9 +30,7 @@ async function getAccessToken(): Promise<string> {
       client_id: AMADEUS_CLIENT_ID,
       client_secret: AMADEUS_CLIENT_SECRET,
     }),
-    {
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    }
+    { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
   );
 
   const token = response.data.access_token;
@@ -34,21 +39,38 @@ async function getAccessToken(): Promise<string> {
   }
 
   accessToken = token;
-  tokenExpiresAt = Date.now() + response.data.expires_in * 1000 - 5000; // refresh 5s early
+  tokenExpiresAt = Date.now() + response.data.expires_in * 1000 - 5000;
 
-  return token; // <-- return token instead of accessToken
+  return token; // <-- always return token here
 }
 
-// Search flights
-export const searchFlights = async (origin: string, destination: string, date: string): Promise<FlightOffer[]> => {
+// --- Replace old searchFlights with this ---
+export const searchFlights = async (
+  origin: string,
+  destination: string,
+  date: string,
+  filters?: FlightFilters
+): Promise<FlightOffer[]> => {
   const token = await getAccessToken();
+
+  const params: any = {
+    originLocationCode: origin,
+    destinationLocationCode: destination,
+    departureDate: date,
+    adults: 1,
+    max: 10,
+  };
+
+  if (filters?.nonStop) params.nonStop = true;
+  if (filters?.maxPrice) params.maxPrice = filters.maxPrice;
+  if (filters?.airlines) params.airlines = filters.airlines.join(',');
 
   const response = await axios.get(`${AMADEUS_BASE_URL}/v2/shopping/flight-offers`, {
     headers: { Authorization: `Bearer ${token}` },
-    params: { originLocationCode: origin, destinationLocationCode: destination, departureDate: date, adults: 1, max: 5 },
+    params,
   });
 
-  const rawOffers = response.data.data; // <-- Amadeus returns offers in data array
+  const rawOffers = response.data.data;
   if (!rawOffers || !Array.isArray(rawOffers)) {
     throw new ApiError(500, "No flight offers returned from Amadeus");
   }

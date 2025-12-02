@@ -1,9 +1,9 @@
 // src/__tests__/amadeus.mock.test.ts
 import axios from "axios";
-import { searchFlights } from "../modules/amadeus/amadeus.service";
-import { mapAmadeusFlightOffers } from "../modules/amadeus/amadeus.mapper";
-import { FlightOffer } from "../modules/amadeus/amadeus.types";
-import ApiError from "../utils/ApiError";
+import { searchFlights } from "../../modules/amadeus/amadeus.service";
+import { mapAmadeusFlightOffers } from "../../modules/amadeus/amadeus.mapper";
+import { FlightOffer } from "../../modules/amadeus/amadeus.types";
+import ApiError from "../../utils/ApiError";
 
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;

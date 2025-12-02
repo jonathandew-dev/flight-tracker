@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { registerUser, loginUser } from "./auth.service";
 import { catchAsync } from "../../utils/catchAsync";
 
 
 // REGISTER
-export const registerUserController = catchAsync(async (req: Request, res: Response) => {
+export const registerUserController = catchAsync(async (req: Request, res: Response,next:NextFunction) => {
   const user = await registerUser(req.body);
   const { password, ...userWithoutPassword } = user;
   res.status(201).json({ user: userWithoutPassword });

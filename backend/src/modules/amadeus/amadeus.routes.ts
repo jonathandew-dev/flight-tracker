@@ -3,6 +3,6 @@ import { searchFlightsController } from "./amadeus.controller";
 
 const router = Router();
 
-router.get("/flights", searchFlightsController);
+router.get("/search", searchFlightsController);
 
 export default router;

@@ -1,4 +1,9 @@
+# Node
 node_modules/
-.env
+# Build outputs
 dist/
-generated/
+build/
+# Environment variables
+.env
+# MacOS / system files
+.DS_Store

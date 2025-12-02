@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@types/logform": "^1.2.0"
+  }
+}

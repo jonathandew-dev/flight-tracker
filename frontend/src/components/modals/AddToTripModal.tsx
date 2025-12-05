@@ -1,14 +1,13 @@
-// src/components/modals/AddToTripModal.tsx
 import React, { useState } from "react";
 import { SavedTrip, Flight } from "@/utils/types";
 import { Button } from "../Button";
+import { useAddFlight } from "@/api/addFlightService";
 
 interface AddToTripModalProps {
   isOpen: boolean;
   onClose: () => void;
   trips: SavedTrip[];
   flight: Flight;
-  onAddFlight: (tripId: string, flight: Flight) => void;
 }
 
 const AddToTripModal: React.FC<AddToTripModalProps> = ({
@@ -16,11 +15,37 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({
   onClose,
   trips,
   flight,
-  onAddFlight,
 }) => {
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const addFlightMutation = useAddFlight(); // returns UseMutationResult
 
   if (!isOpen) return null;
+
+  const handleAdd = async () => {
+    if (!selectedTripId) return;
+
+    const trip = trips.find((t) => t.id === selectedTripId);
+    if (
+      trip?.flights.some(
+        (f) =>
+          f.flightNumber === flight.flightNumber &&
+          f.departureTime === flight.departureTime
+      )
+    ) {
+      alert("This flight is already added to this trip.");
+      return;
+    }
+
+    try {
+      await addFlightMutation.mutateAsync({
+        tripId: selectedTripId,
+        flight: flight,
+      });
+      onClose();
+    } catch (err) {
+      console.error("Failed to add flight:", err);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -56,16 +81,11 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({
             Cancel
           </Button>
           <Button
-            onClick={() => {
-              if (selectedTripId) {
-                onAddFlight(selectedTripId, flight);
-                onClose();
-              }
-            }}
+            onClick={handleAdd}
             className="bg-blue-500 hover:bg-blue-600 text-white"
-            disabled={!selectedTripId}
+            disabled={!selectedTripId || addFlightMutation.status === "pending"}
           >
-            Add
+            {addFlightMutation.status === "pending" ? "Adding..." : "Add"}
           </Button>
         </div>
       </div>

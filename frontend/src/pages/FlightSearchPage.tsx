@@ -3,7 +3,10 @@ import { useState } from "react";
 import { searchFlights } from "@/api/api";
 import FlightResultCard from "@/components/cards/FlightResultCard";
 import AddToTripModal from "@/components/modals/AddToTripModal";
-import { useSavedTripStore } from "@/store/savedTripStore";
+import { useSavedTrips } from "@/api/savedTripService";
+
+
+
 import { Flight } from "@/utils/types";
 
 const FlightSearchPage = () => {
@@ -14,15 +17,17 @@ const FlightSearchPage = () => {
   const [adults, setAdults] = useState(1);
   const [maxResults, setMaxResults] = useState(5);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
-
-  const trips = useSavedTripStore((state) => state.trips);
-  const addFlightToTrip = useSavedTripStore((state) => state.addFlight);
 
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+
+  // --- Backend trips & addFlight mutation ---
+  const { data: trips = [] } = useSavedTrips();
+  console.log("Trips Data",trips);
 
   // --- Search Flights ---
   const handleSearch = async () => {
@@ -34,6 +39,7 @@ const FlightSearchPage = () => {
     setLoading(true);
     setError("");
     setFlights([]);
+
     try {
       const results = await searchFlights({
         originLocationCode,
@@ -52,12 +58,13 @@ const FlightSearchPage = () => {
     }
   };
 
-  // --- Add to Trip Placeholder ---
+  // --- Open modal for selected flight ---
   const handleAddToTrip = (flight: Flight) => {
     setSelectedFlight(flight);
     setIsModalOpen(true);
   };
 
+  // --- Render ---
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Search Flights</h1>
@@ -115,6 +122,7 @@ const FlightSearchPage = () => {
         </button>
       </div>
 
+      {/* --- Loading / Error --- */}
       {loading && <p>Loading flights...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
@@ -128,13 +136,16 @@ const FlightSearchPage = () => {
           />
         ))}
       </div>
-      <AddToTripModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        trips={trips}
-        flight={selectedFlight!}
-        onAddFlight={addFlightToTrip}
-      />
+
+      {/* --- Add to Trip Modal --- */}
+      {selectedFlight && (
+        <AddToTripModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          trips={trips}
+          flight={selectedFlight!} // flight is required
+        />
+      )}
     </div>
   );
 };

@@ -21,6 +21,10 @@ const TripCard: React.FC<TripCardProps> = ({
   onDeleteTrip,
   onUpdateTripTitle,
 }) => {
+  
+  console.log("Trip objects:" ,trip);
+  console.log("Trip flights:" ,trip.flights);
+
   const [addingFlight, setAddingFlight] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [title, setTitle] = useState(trip.title);
@@ -78,9 +82,9 @@ const TripCard: React.FC<TripCardProps> = ({
           {trip.flights.length === 0 ? (
             <p className="text-gray-500 text-sm">No flights added yet.</p>
           ) : (
-            trip.flights.map((f: Flight, idx: number) => (
+            trip.flights.map((f: Flight) => (
               <div
-                key={f.id ?? idx}
+                key={f.id}
                 className="flex justify-between items-center bg-gray-50 p-3 rounded hover:bg-gray-100 transition"
               >
                 <span className="text-sm font-medium">

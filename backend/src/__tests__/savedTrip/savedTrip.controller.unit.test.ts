@@ -24,7 +24,7 @@ describe("SavedTrip controller", () => {
 
       (savedTripService.createSavedTrip as jest.Mock).mockResolvedValue({ id: "1" });
 
-      await savedTripController.createSavedTripHandler(req, res, next);
+      await savedTripController.createSavedTrip(req, res, next);
 
       expect(savedTripService.createSavedTrip).toHaveBeenCalledWith({
         title: "Trip 1",
@@ -43,7 +43,7 @@ describe("SavedTrip controller", () => {
 
       (savedTripService.createSavedTrip as jest.Mock).mockRejectedValue(new Error("boom"));
 
-      await savedTripController.createSavedTripHandler(req, res, next);
+      await savedTripController.createSavedTrip(req, res, next);
 
       expect(next).toHaveBeenCalled();
       const errorArg = next.mock.calls[0][0] as unknown as Error;

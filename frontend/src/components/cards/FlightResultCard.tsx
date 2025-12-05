@@ -17,7 +17,8 @@ const FlightResultCard: React.FC<FlightResultCardProps> = ({ flight, onAddToTrip
           {flight.airline} {flight.flightNumber}
         </h3>
         <span className="font-medium">
-          {flight.price.total} {flight.price.currency}
+         {new Intl.NumberFormat("en-US", { style: "currency", currency: flight.price.currency }).format(parseFloat(flight.price.total))}
+
         </span>
       </div>
 

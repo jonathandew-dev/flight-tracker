@@ -1,65 +1,48 @@
-import { FlightOffer, Itinerary, Segment, Price } from "./amadeus.types";
+import { FlightOffer } from "./amadeus.types";
 
-export function mapAmadeusFlightOffer(raw: any): FlightOffer {
-  // Map itineraries
-  const itineraries: Itinerary[] = raw.itineraries?.map((iti: any) => ({
-    segments: iti.segments.map((seg: any): Segment => ({
-      departure: {
-        iataCode: seg.departure.iataCode,
-        at: seg.departure.at,
-        terminal: seg.departure.terminal,
-      },
-      arrival: {
-        iataCode: seg.arrival.iataCode,
-        at: seg.arrival.at,
-        terminal: seg.arrival.terminal,
-      },
-      carrierCode: seg.carrierCode,
-      flightNumber: seg.number || "",      // <-- map flight number
-      duration: seg.duration,
-      aircraft: seg.aircraft?.code,
-    })),
-    duration: iti.duration,
-    stops: iti.segments.length - 1,
-  }));
-
-  // Collect all airline codes across itineraries
-  const airlineCodes = Array.from(
-    new Set(itineraries.flatMap(iti => iti.segments.map(seg => seg.carrierCode)))
-  );
-
-  // Total stops across all itineraries
-  const numberOfStops = itineraries.reduce((sum, iti) => sum + (iti.segments.length - 1), 0);
-
-  // Price
-  const price: Price = {
-    total: raw.price?.total || "0",
-    currency: raw.price?.currency || "USD",
-  };
-
-  // Optional baggage allowance
-  let baggageAllowance: string | undefined = undefined;
-  if (raw.travelerPricings?.[0]?.fareDetailsBySegment) {
-    const baggageInfo = raw.travelerPricings[0].fareDetailsBySegment.map((s: any) => s.bags?.[0]?.description).filter(Boolean);
-    if (baggageInfo.length) baggageAllowance = baggageInfo.join(", ");
-  }
-
-  // Booking link if available
-  const links = raw.offers?.[0]?.links ? { booking: raw.offers[0].links[0]?.href } : undefined;
-
-  return {
-    id: raw.id,
-    price,
-    itineraries,
-    airlineCodes,
-    numberOfStops,
-    baggageAllowance,
-    currency: price.currency,
-    links,
+export interface Flight {
+  id: string;
+  airline: string;
+  flightNumber: string;
+  origin: string;
+  destination: string;
+  departureTime: string;
+  arrivalTime: string;
+  price: {
+    total: string;
+    currency: string;
   };
 }
 
-// Optional: map an array
-export function mapAmadeusFlightOffers(rawData: any[]): FlightOffer[] {
-  return rawData.map(mapAmadeusFlightOffer);
+export function mapAmadeusFlightOffer(offer: FlightOffer): Flight {
+  const itinerary = offer.itineraries[0];
+  const segment = itinerary.segments[0];
+
+  return {
+    id: offer.id,
+    airline: segment.carrierCode,
+    flightNumber: segment.flightNumber,
+    origin: segment.departure.iataCode,
+    destination: segment.arrival.iataCode,
+    departureTime: segment.departure.at,
+    arrivalTime: segment.arrival.at,
+    price: convertPriceToUSD(offer.price),
+  };
+}
+
+export function mapAmadeusFlightOffers(offers: FlightOffer[]): Flight[] {
+  return offers.map(mapAmadeusFlightOffer);
+}
+
+function convertPriceToUSD(price: { total: string; currency: string }): { total: string; currency: string } {
+  if (price.currency === "USD") return price;
+
+  const rates: Record<string, number> = {
+    EUR: 1.07,
+    GBP: 1.25,
+    CAD: 0.73,
+  };
+
+  const amountUSD = parseFloat(price.total) * (rates[price.currency] || 1);
+  return { total: amountUSD.toFixed(2), currency: "USD" };
 }

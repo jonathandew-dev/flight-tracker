@@ -9,10 +9,21 @@ interface FlightCardProps {
 const FlightCard: React.FC<FlightCardProps> = ({ flight }) => {
   return (
     <div className="bg-white p-4 rounded shadow hover:shadow-lg transition">
-      <p>{flight.airline} — {flight.flightNumber}</p>
-      <p>{flight.origin} → {flight.destination}</p>
-      <p>{flight.departureTime} - {flight.arrivalTime}</p>
-      <p>${flight.price}</p>
+      <p>
+        {flight.airline} — {flight.flightNumber}
+      </p>
+      <p>
+        {flight.origin} → {flight.destination}
+      </p>
+      <p>
+        {flight.departureTime} - {flight.arrivalTime}
+      </p>
+      <p>
+        {new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: flight.price.currency,
+        }).format(parseFloat(flight.price.total))}
+      </p>
     </div>
   );
 };

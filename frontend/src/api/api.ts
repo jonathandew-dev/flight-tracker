@@ -12,6 +12,7 @@ export default api;
 
 // ---------------------------
 // Flight search function
+//----------------------------
 export interface SearchFlightsParams {
   originLocationCode: string;
   destinationLocationCode: string;

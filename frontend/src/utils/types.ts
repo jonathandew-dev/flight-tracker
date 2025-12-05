@@ -1,9 +1,4 @@
-export interface SavedTrip {
-  id: string;
-  title: string;
-  flights: Flight[]; 
-}
-
+// src/utils/types.ts
 export interface Flight {
   id: string;
   airline: string;
@@ -12,5 +7,14 @@ export interface Flight {
   destination: string;
   departureTime: string;
   arrivalTime: string;
-  price: { total: string; currency: string };
+  price: {
+    total: string;   // already converted to USD
+    currency: string;
+  };
+}
+
+export interface SavedTrip {
+  id: string;
+  title: string;
+  flights: Flight[];
 }

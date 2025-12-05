@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { searchFlights } from "./amadeus.service";
 
+
+
 export const searchFlightsHandler = async (req: Request, res: Response) => {
   try {
     const { originLocationCode, destinationLocationCode, departureDate, returnDate, adults, max } = req.query;

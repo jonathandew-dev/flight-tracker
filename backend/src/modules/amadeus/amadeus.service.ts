@@ -1,6 +1,7 @@
 import axios from "axios";
 import ApiError from "../../utils/ApiError";
 import { FlightOffer } from "./amadeus.types";
+
 import { mapAmadeusFlightOffers } from "./amadeus.mapper";
 
 const AMADEUS_CLIENT_ID = process.env.AMADEUS_CLIENT_ID!;
@@ -48,22 +49,22 @@ async function getAccessToken(): Promise<string> {
 export const searchFlights = async (
   origin: string,
   destination: string,
-  date: string,
-  filters?: FlightFilters
+  departureDate: string,
+  returnDate?: string,
+  adults = 1,
+  max = 5
 ): Promise<FlightOffer[]> => {
   const token = await getAccessToken();
 
   const params: any = {
     originLocationCode: origin,
     destinationLocationCode: destination,
-    departureDate: date,
-    adults: 1,
-    max: 10,
+    departureDate,
+    adults,
+    max,
   };
 
-  if (filters?.nonStop) params.nonStop = true;
-  if (filters?.maxPrice) params.maxPrice = filters.maxPrice;
-  if (filters?.airlines) params.airlines = filters.airlines.join(',');
+  if (returnDate) params.returnDate = returnDate;
 
   const response = await axios.get(`${AMADEUS_BASE_URL}/v2/shopping/flight-offers`, {
     headers: { Authorization: `Bearer ${token}` },

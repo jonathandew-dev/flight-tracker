@@ -1,10 +1,32 @@
 import axios from "axios";
+import { Flight } from "@/utils/types";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 export default api;
+
+// ---------------------------
+// Flight search function
+export interface SearchFlightsParams {
+  origin: string;
+  destination: string;
+  departureDate: string;
+  returnDate?: string;
+}
+
+export const searchFlights = async (params: {
+  origin: string;
+  destination: string;
+  departureDate: string;
+  returnDate?: string;
+  adults?: number;
+  max?: number;
+}): Promise<Flight[]> => {
+  const { data } = await api.get("/api/amadeus/search", { params });
+  return data;
+};

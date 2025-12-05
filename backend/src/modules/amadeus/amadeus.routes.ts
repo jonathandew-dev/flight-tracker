@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { searchFlightsController } from "./amadeus.controller";
+import { searchFlightsHandler } from "./amadeus.controller";
 
 const router = Router();
 
-router.get("/search", searchFlightsController);
+router.get("/search", searchFlightsHandler);
 
 export default router;

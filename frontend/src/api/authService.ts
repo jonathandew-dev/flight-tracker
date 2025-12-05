@@ -1,35 +1,38 @@
 import axios from "axios";
-import { useMutation } from "@tanstack/react-query"; // ← make sure this is here
+import { useMutation } from "@tanstack/react-query";
 
 // Axios instance
 export const api = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
   headers: { "Content-Type": "application/json" },
 });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("authToken");
-  if (token) {
-    if (!config.headers) config.headers = {};  // ← ensure headers object exists
-    if (!config.headers.Authorization) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
+  if (!config.headers) config.headers = new axios.AxiosHeaders();
+  if (token) config.headers.set("Authorization", `Bearer ${token}`);
   return config;
 });
+
 // Types
 export interface AuthPayload {
   email: string;
   password: string;
 }
 
+export interface User {
+  id: string;
+  email: string;
+  name?: string | null;
+}
+
 export interface AuthResponse {
-  user: { id: string; email: string; name?: string | null };
+  user: User;
   accessToken: string;
   refreshToken: string;
 }
 
-// React Query mutations
+// React Query hooks
 export const useLogin = () =>
   useMutation<AuthResponse, Error, AuthPayload>({
     mutationFn: async (payload: AuthPayload) => {
@@ -46,12 +49,22 @@ export const useRegister = () =>
     },
   });
 
-// Auth token management
-export const setAuthToken = (token: string | null, user?: any) => {
+export const useUpdateUser = () => {
+  return useMutation<User, Error, { name?: string | null }>({
+    mutationFn: async (data) => {
+      const response = await api.patch<User>("/api/users/me", data);
+      return response.data;
+    },
+  });
+};
+
+
+// Token management
+export const setAuthToken = (token: string | null, user?: User) => {
   if (token) {
     localStorage.setItem("authToken", token);
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     if (user) localStorage.setItem("user", JSON.stringify(user));
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");

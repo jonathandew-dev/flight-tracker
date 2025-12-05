@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import  {api}  from "./authService"; 
-import { SavedTrip } from "../utils/types";
+
+import { SavedTrip,Flight } from "../utils/types.js";
+import {api} from "./authService.js"
 
 // --- Fetch Saved Trips ---
 export const useSavedTrips = () =>
@@ -16,7 +17,7 @@ export const useSavedTrips = () =>
 export const useCreateSavedTrip = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<SavedTrip, Error, { title: string; flights: any[] }>({
+  return useMutation<SavedTrip, Error, { title: string; flights: Flight[] }>({
     mutationFn: async (newTrip) => {
       const { data } = await api.post<SavedTrip>("/api/saved-trips", newTrip);
       return data;

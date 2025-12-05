@@ -40,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/auth", authRoutes);
 app.use('/users', userRoutes);
 app.use("/api/saved-trips",savedTripRoutes);
-app.use("/api/flights", amadeusRoutes);
+app.use("/api/amadeus", amadeusRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running");

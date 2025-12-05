@@ -1,17 +1,32 @@
-// src/store/authStore.ts
 import { create } from "zustand";
 
-export interface User {
+type User = {
   id: string;
   email: string;
-}
+  name?: string | null;
+};
 
-export interface AuthState {
+type AuthState = {
   user: User | null;
-  setUser: (user: User | null) => void;
-}
+  accessToken: string | null;
+
+  setAuth: (token: string, user: User) => void;
+  logout: () => void;
+};
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  setUser: (user) => set({ user }),
+  accessToken: null,
+
+  setAuth: (token, user) =>
+    set({
+      accessToken: token,
+      user: user,
+    }),
+
+  logout: () =>
+    set({
+      accessToken: null,
+      user: null,
+    }),
 }));

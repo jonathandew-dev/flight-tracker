@@ -1,15 +1,13 @@
-import React, { useContext } from "react";
-import { Navigate, Outlet } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import React from "react";
+import { Navigate,Outlet } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
-const ProtectedRoute: React.FC = () => {
-  const { user } = useContext(AuthContext);
 
-  // If no user, redirect to login
+
+export const ProtectedRoute = () => {
+  const user = useAuthStore((state) => state.user);
+
   if (!user) return <Navigate to="/login" replace />;
 
-  // If user exists, render child routes
-  return <Outlet />;
+  return <Outlet />; 
 };
-
-export default ProtectedRoute;

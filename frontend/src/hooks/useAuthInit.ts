@@ -1,44 +1,105 @@
-import { useEffect, useContext, useState } from "react";
-import { AuthContext, User } from "../context/AuthContext";
-import { setAuthToken, api } from "../api/authService";
+// src/hooks/useAuthInit.ts
+import { useEffect } from "react";
+import axios, { AxiosHeaders, InternalAxiosRequestConfig } from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { useAuthStore } from "../store/authStore";
 
-interface MeResponse {
-  user: User;
+
+// -----------------------------
+// Axios instance
+// -----------------------------
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  headers: { "Content-Type": "application/json" },
+});
+
+// Attach token dynamically from localStorage
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+    const token = localStorage.getItem("token");
+
+    if (!config.headers){
+      config.headers = new AxiosHeaders();
+    }
+
+    if (token) {
+      (config.headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+    }
+
+    return config;
+  }
+);
+
+// -----------------------------
+// Types
+// -----------------------------
+export interface AuthPayload {
+  email: string;
+  password: string;
 }
 
+export interface User {
+  id: string;
+  email: string;
+  name?: string | null;
+}
+
+export interface AuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken?: string;
+}
+
+// -----------------------------
+// React Query hooks
+// -----------------------------
+export const useLogin = () => {
+  const setAuth = useAuthStore((state) => state.setAuth);
+
+  return useMutation<AuthResponse, Error, AuthPayload>({
+    mutationFn: async (payload: AuthPayload) => {
+      const res = await api.post<AuthResponse>("/auth/login", payload);
+      const { accessToken, user } = res.data;
+
+      // Save to Zustand + localStorage
+      setAuth(accessToken, user);
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      return res.data;
+    },
+  });
+};
+
+export const useRegister = () => {
+  const setAuth = useAuthStore((state) => state.setAuth);
+
+  return useMutation<AuthResponse, Error, AuthPayload>({
+    mutationFn: async (payload: AuthPayload) => {
+      const res = await api.post<AuthResponse>("/auth/register", payload);
+      const { accessToken, user } = res.data;
+
+      setAuth(accessToken, user);
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      return res.data;
+    },
+  });
+};
+
+// -----------------------------
+// Hook to initialize auth on app load
+// -----------------------------
 export const useAuthInit = () => {
-  const { setUser } = useContext(AuthContext);
-  const [loading, setLoading] = useState(true);
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   useEffect(() => {
-    const initAuth = async () => {
-      const token = localStorage.getItem("authToken");
-      const userStr = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
 
-      if (token) setAuthToken(token); // always set Axios header
-
-      if (userStr) setUser(JSON.parse(userStr)); // populate context immediately
-
-      if (token) {
-        try {
-          const res = await api.get<MeResponse>("/auth/me");
-          setUser(res.data.user); // update user with backend data
-          setAuthToken(token, res.data.user); // refresh storage just in case
-        } catch (err) {
-          console.warn("Token invalid or /auth/me failed", err);
-          setAuthToken(null);
-          setUser(null);
-        }
-      } else {
-        setAuthToken(null);
-        setUser(null);
-      }
-
-      setLoading(false);
-    };
-
-    initAuth();
-  }, [setUser]);
-
-  return { loading };
+    if (token && user) {
+      setAuth(token, JSON.parse(user));
+    }
+  }, [setAuth]); // ✅ include setAuth in deps to satisfy ESLint
 };

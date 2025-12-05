@@ -1,7 +1,7 @@
 // src/components/FlightForm.tsx
 import React, { useState } from "react";
-import { Button } from "./Button";
-import { Flight } from "../utils/types";
+import { Button } from "../Button";
+import { Flight } from "../../utils/types";
 
 interface FlightFormProps {
   onSubmit: (flight: Flight) => void;

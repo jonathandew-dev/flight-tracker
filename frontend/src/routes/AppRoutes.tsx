@@ -8,6 +8,7 @@ import SavedTripPage from "../pages/SavedTripPage";
 import NavBar from "../components/NavBar";
 import {ProtectedRoute} from "../components/ProtectedRoute";
 import ProfilePage from "../pages/ProfilePage";
+import FlightSearchPage from "@/pages/FlightSearchPage";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -23,6 +24,7 @@ const AppRoutes: React.FC = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/saved-trips" element={<SavedTripPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/flights" element={<FlightSearchPage />} />
           </Route>
         </Routes>
       </main>

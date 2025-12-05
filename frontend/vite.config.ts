@@ -4,11 +4,12 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig({
+  root: path.resolve(__dirname,), 
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src")
     },
-    extensions: [".js", ".ts", ".jsx", ".tsx",".json"]
+    extensions: [".js", ".ts", ".jsx", ".tsx", ".json"]
   }
 });

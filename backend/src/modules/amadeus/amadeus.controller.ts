@@ -2,21 +2,26 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { searchFlights } from "./amadeus.service";
 
-export const searchFlightsController = catchAsync(async (req: Request, res: Response) => {
-  const { origin, destination, date, nonStop, maxPrice, airlines } = req.query;
+export const searchFlightsHandler = async (req: Request, res: Response) => {
+  try {
+    const { originLocationCode, destinationLocationCode, departureDate, returnDate, adults, max } = req.query;
 
-  if (!origin || !destination || !date) {
-    return res.status(400).json({ message: "origin, destination, and date are required" });
+    if (!originLocationCode || !destinationLocationCode || !departureDate) {
+      return res.status(400).json({ message: "Missing required parameters" });
+    }
+
+    const flights = await searchFlights(
+      originLocationCode as string,
+      destinationLocationCode as string,
+      departureDate as string,
+      returnDate ? (returnDate as string) : undefined,
+      adults ? parseInt(adults as string) : 1,
+      max ? parseInt(max as string) : 5
+    );
+
+    res.json(flights);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch flights from Amadeus" });
   }
-
-  // Convert filters to proper types
-  const filters = {
-    nonStop: nonStop === 'true', // query params are strings
-    maxPrice: maxPrice ? Number(maxPrice) : undefined,
-    airlines: airlines ? (airlines as string).split(',') : undefined,
-  };
-
-  const flights = await searchFlights(origin as string, destination as string, date as string, filters);
-
-  res.status(200).json({ flights });
-});
+};

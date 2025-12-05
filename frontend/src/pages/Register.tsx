@@ -1,30 +1,38 @@
-import React, { useState, useContext } from "react";
-import { Input } from "../components/Input";
+import React, { useState } from "react";
+import { Input } from "../components/forms/Input";
 import { Button } from "../components/Button";
-import { useRegister, setAuthToken } from "../api/authService";
+import { useRegister, setAuthToken, User } from "../api/authService";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { useAuthStore } from "../store/authStore";
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useContext(AuthContext);
-  const navigate = useNavigate();
 
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const navigate = useNavigate();
   const { mutateAsync, status } = useRegister();
   const isLoading = status === "pending";
+  const [error, setError] = useState<string | null>(null);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setError(null);
     try {
       const data = await mutateAsync({ email, password });
-      setAuthToken(data.accessToken, data.user); // save token + user
-      setUser(data.user);
-      navigate("/dashboard"); // redirect
-    } catch (error: any) {
-      console.error(error);
-      alert(error.message || "Registration failed");
+
+      if (!data.accessToken || !data.user)
+        throw new Error("Registration failed");
+
+      setAuthToken(data.accessToken, data.user);
+      setAuth(data.accessToken, data.user as User);
+
+      navigate("/dashboard");
+    } catch (err: unknown) {
+      console.error(err);
+      const message =
+        err instanceof Error ? err.message : "Registration failed";
+      setError(message);
     }
   };
 
@@ -37,13 +45,16 @@ const Register: React.FC = () => {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={isLoading}
         />
         <Input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={isLoading}
         />
+        {error && <p className="text-red-500 text-sm">{error}</p>}
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Registering..." : "Register"}
         </Button>

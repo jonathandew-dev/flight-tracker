@@ -25,14 +25,32 @@ export const useAddFlight = () => {
         `/api/saved-trips/${tripId}/flights`,
         flight,
         {
-          headers: { "Content-Type": "application/json" }, // enforce JSON
+          headers: { "Content-Type": "application/json" },
         }
       );
 
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["savedTrips"] }); // refresh saved trips
+      queryClient.invalidateQueries({ queryKey: ["savedTrips"] });
+    },
+  });
+};
+
+// --- Delete Flight ---
+export const useDeleteFlight = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    void,
+    Error,
+    { tripId: string; flightId: string }
+  >({
+    mutationFn: async ({ tripId, flightId }) => {
+      await api.delete(`/api/saved-trips/${tripId}/flights/${flightId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["savedTrips"] });
     },
   });
 };

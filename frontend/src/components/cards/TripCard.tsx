@@ -1,8 +1,9 @@
 // src/components/TripCard.tsx
 import React, { useState } from "react";
-import { SavedTrip, Flight } from "../utils/types";
-import { Button } from "./Button";
-import FlightForm from "./FlightForm";
+
+import { SavedTrip,Flight } from "../../utils/types";
+import { Button } from "../Button";
+import FlightForm from "../forms/FlightForm";
 import { Trash2, Edit, Plus, X, Save, ChevronDown, ChevronUp } from "lucide-react";
 
 interface TripCardProps {

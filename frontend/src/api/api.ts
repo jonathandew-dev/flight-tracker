@@ -13,15 +13,17 @@ export default api;
 // ---------------------------
 // Flight search function
 export interface SearchFlightsParams {
-  origin: string;
-  destination: string;
+  originLocationCode: string;
+  destinationLocationCode: string;
   departureDate: string;
   returnDate?: string;
+  adults?: number;
+  max?: number;
 }
 
 export const searchFlights = async (params: {
-  origin: string;
-  destination: string;
+  originLocationCode: string;
+  destinationLocationCode: string;
   departureDate: string;
   returnDate?: string;
   adults?: number;

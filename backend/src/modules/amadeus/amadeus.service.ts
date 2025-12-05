@@ -11,12 +11,7 @@ const AMADEUS_BASE_URL = "https://test.api.amadeus.com";
 let accessToken: string | null = null;
 let tokenExpiresAt: number | null = null;
 
-// --- FlightFilters type ---
-type FlightFilters = {
-  nonStop?: boolean;
-  maxPrice?: number;
-  airlines?: string[];
-};
+
 
 // --- getAccessToken stays the same ---
 async function getAccessToken(): Promise<string> {
@@ -66,15 +61,31 @@ export const searchFlights = async (
 
   if (returnDate) params.returnDate = returnDate;
 
-  const response = await axios.get(`${AMADEUS_BASE_URL}/v2/shopping/flight-offers`, {
-    headers: { Authorization: `Bearer ${token}` },
-    params,
-  });
+  // --- LOGGING: inspect request ---
+  console.log("Amadeus request params:", params);
+  console.log("Token exists?", !!token);
 
-  const rawOffers = response.data.data;
-  if (!rawOffers || !Array.isArray(rawOffers)) {
-    throw new ApiError(500, "No flight offers returned from Amadeus");
+  try {
+    const response = await axios.get(
+      `${AMADEUS_BASE_URL}/v2/shopping/flight-offers`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params,
+      }
+    );
+
+    // --- LOGGING: inspect raw Amadeus response ---
+    console.log("Amadeus raw response data:", response.data);
+
+    const rawOffers = response.data.data;
+    if (!rawOffers || !Array.isArray(rawOffers)) {
+      throw new ApiError(500, "No flight offers returned from Amadeus");
+    }
+
+    return mapAmadeusFlightOffers(rawOffers);
+  } catch (err: any) {
+    // --- LOGGING: capture the exact API error ---
+    console.error("Amadeus API error:", err.response?.data || err.message);
+    throw err;
   }
-
-  return mapAmadeusFlightOffers(rawOffers);
 };

@@ -12,5 +12,5 @@ export interface Flight {
   destination: string;
   departureTime: string;
   arrivalTime: string;
-  price: number;
+  price: { total: string; currency: string };
 }

@@ -11,20 +11,33 @@ interface FlightResultCardProps {
 const FlightResultCard: React.FC<FlightResultCardProps> = ({ flight, onAddToTrip }) => {
   return (
     <div className="bg-white rounded-xl shadow p-4 flex flex-col gap-2 hover:shadow-lg transition">
+      {/* Flight header */}
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold">{flight.airline} {flight.flightNumber}</h3>
-        <span className="text-sm text-gray-500">${flight.price}</span>
+        <h3 className="font-semibold">
+          {flight.airline} {flight.flightNumber}
+        </h3>
+        <span className="font-medium">
+          {flight.price.total} {flight.price.currency}
+        </span>
       </div>
-      <div className="text-sm text-gray-700">
+
+      {/* Route info */}
+      <div className="text-sm text-gray-600">
         {flight.origin} → {flight.destination}
       </div>
-      <div className="flex justify-between text-xs text-gray-500">
-        <span>Dep: {flight.departureTime}</span>
-        <span>Arr: {flight.arrivalTime}</span>
+
+      {/* Timing info */}
+      <div className="text-sm text-gray-600">
+        Depart: {new Date(flight.departureTime).toLocaleString()}
       </div>
+      <div className="text-sm text-gray-600">
+        Arrive: {new Date(flight.arrivalTime).toLocaleString()}
+      </div>
+
+      {/* Add to trip button */}
       <Button
         onClick={() => onAddToTrip(flight)}
-        className="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+        className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
       >
         Add to Trip
       </Button>

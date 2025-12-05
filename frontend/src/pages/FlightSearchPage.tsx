@@ -2,15 +2,23 @@
 import { useState } from "react";
 import { searchFlights } from "@/api/api";
 import FlightResultCard from "@/components/cards/FlightResultCard";
+import AddToTripModal from "@/components/modals/AddToTripModal";
+import { useSavedTripStore } from "@/store/savedTripStore";
 import { Flight } from "@/utils/types";
 
 const FlightSearchPage = () => {
-  const [origin, setOrigin] = useState("");
-  const [destination, setDestination] = useState("");
+  const [originLocationCode, setOriginLocationCode] = useState("");
+  const [destinationLocationCode, setDestinationLocationCode] = useState("");
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [adults, setAdults] = useState(1);
   const [maxResults, setMaxResults] = useState(5);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+
+  const trips = useSavedTripStore((state) => state.trips);
+  const addFlightToTrip = useSavedTripStore((state) => state.addFlight);
 
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(false);
@@ -18,7 +26,7 @@ const FlightSearchPage = () => {
 
   // --- Search Flights ---
   const handleSearch = async () => {
-    if (!origin || !destination || !departureDate) {
+    if (!originLocationCode || !destinationLocationCode || !departureDate) {
       setError("Please fill in origin, destination, and departure date");
       return;
     }
@@ -28,8 +36,8 @@ const FlightSearchPage = () => {
     setFlights([]);
     try {
       const results = await searchFlights({
-        origin,
-        destination,
+        originLocationCode,
+        destinationLocationCode,
         departureDate,
         returnDate,
         adults,
@@ -46,8 +54,8 @@ const FlightSearchPage = () => {
 
   // --- Add to Trip Placeholder ---
   const handleAddToTrip = (flight: Flight) => {
-    console.log("Flight added to trip:", flight);
-    // Next: open modal or select a saved trip
+    setSelectedFlight(flight);
+    setIsModalOpen(true);
   };
 
   return (
@@ -59,15 +67,15 @@ const FlightSearchPage = () => {
         <input
           type="text"
           placeholder="Origin"
-          value={origin}
-          onChange={(e) => setOrigin(e.target.value)}
+          value={originLocationCode}
+          onChange={(e) => setOriginLocationCode(e.target.value)}
           className="border p-2 rounded"
         />
         <input
           type="text"
           placeholder="Destination"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
+          value={destinationLocationCode}
+          onChange={(e) => setDestinationLocationCode(e.target.value)}
           className="border p-2 rounded"
         />
         <input
@@ -120,6 +128,13 @@ const FlightSearchPage = () => {
           />
         ))}
       </div>
+      <AddToTripModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        trips={trips}
+        flight={selectedFlight!}
+        onAddFlight={addFlightToTrip}
+      />
     </div>
   );
 };

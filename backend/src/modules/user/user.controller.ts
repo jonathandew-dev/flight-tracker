@@ -25,3 +25,10 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
   await userService.deleteUser(req.params.id);
   res.status(204).send();
 });
+
+
+export const updateMe = catchAsync(async (req, res) => {
+  const userId = req.userId!;
+  const updatedUser = await userService.updateUser(userId, req.body);
+  res.json(updatedUser);
+});

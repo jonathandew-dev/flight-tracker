@@ -18,3 +18,10 @@ export interface SavedTrip {
   title: string;
   flights: Flight[];
 }
+
+export interface User {
+  id: string;
+  email: string;
+  name?: string | null; // optional in case the user hasn't set it yet
+  avatarUrl?: string | null; // optional if you want to support user avatars later
+}

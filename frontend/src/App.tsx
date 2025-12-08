@@ -1,11 +1,17 @@
 import React from "react";
 import AppRoutes from "./routes/AppRoutes";
-import { useAuthInit } from "./hooks/useAuthInit";
+import { Toaster } from "react-hot-toast";
+import { restoreAuth } from "./api/authService";
+
+restoreAuth(); 
 
 const App: React.FC = () => {
-   useAuthInit();
-
-  return <AppRoutes />;
+  return (
+    <>
+      <Toaster position="top-center" />
+      <AppRoutes />
+    </>
+  );
 };
 
 export default App;

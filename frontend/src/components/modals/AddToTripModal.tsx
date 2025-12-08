@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { SavedTrip, Flight } from "@/utils/types";
 import { Button } from "../Button";
-import { useAddFlight } from "@/api/addFlightService";
 
 interface AddToTripModalProps {
   isOpen: boolean;
   onClose: () => void;
   trips: SavedTrip[];
+  selectedTripId: string | null;
+  onSelectTrip: (tripId: string) => void;
+  handleConfirm: () => void; // renamed
   flight: Flight;
 }
 
@@ -14,48 +16,19 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({
   isOpen,
   onClose,
   trips,
-  flight,
+  selectedTripId,
+  onSelectTrip,
+  handleConfirm, // renamed here
 }) => {
-  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
-  const addFlightMutation = useAddFlight(); // returns UseMutationResult
-
   if (!isOpen) return null;
-
-  const handleAdd = async () => {
-    if (!selectedTripId) return;
-
-    const trip = trips.find((t) => t.id === selectedTripId);
-    if (
-      trip?.flights.some(
-        (f) =>
-          f.flightNumber === flight.flightNumber &&
-          f.departureTime === flight.departureTime
-      )
-    ) {
-      alert("This flight is already added to this trip.");
-      return;
-    }
-
-    try {
-      await addFlightMutation.mutateAsync({
-        tripId: selectedTripId,
-        flight: flight,
-      });
-      onClose();
-    } catch (err) {
-      console.error("Failed to add flight:", err);
-    }
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded-xl shadow-lg p-6 w-96">
-        <h2 className="text-xl font-bold mb-4">Add Flight to Trip</h2>
+        <h2 className="text-xl font-bold mb-4">Select Trip</h2>
 
         {trips.length === 0 ? (
-          <p className="text-gray-500">
-            No trips available. Create a trip first.
-          </p>
+          <p className="text-gray-500">No trips available. Create a trip first.</p>
         ) : (
           <div className="flex flex-col gap-2 mb-4">
             {trips.map((trip) => (
@@ -68,7 +41,7 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({
                   name="trip"
                   value={trip.id}
                   checked={selectedTripId === trip.id}
-                  onChange={() => setSelectedTripId(trip.id)}
+                  onChange={() => onSelectTrip(trip.id)}
                 />
                 {trip.title}
               </label>
@@ -81,11 +54,11 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({
             Cancel
           </Button>
           <Button
-            onClick={handleAdd}
+            onClick={handleConfirm} // renamed usage
             className="bg-blue-500 hover:bg-blue-600 text-white"
-            disabled={!selectedTripId || addFlightMutation.status === "pending"}
+            disabled={!selectedTripId}
           >
-            {addFlightMutation.status === "pending" ? "Adding..." : "Add"}
+            Continue
           </Button>
         </div>
       </div>

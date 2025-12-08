@@ -79,24 +79,64 @@ export const updateFlightInTrip = async (req: Request, res: Response) => {
 export const addFlightToTrip = async (req: Request, res: Response) => {
   try {
     const tripId = req.params.tripId;
-    const flight = { id: uuidv4(), ...req.body }; // Add internal UUID
+    const flightData = req.body;
 
     const trip = await prisma.savedTrip.findUnique({ where: { id: tripId } });
     if (!trip) return res.status(404).json({ message: "Trip not found" });
 
-    const existingFlights: Record<string, any>[] = Array.isArray(trip.flights)
+    const flights: Record<string, any>[] = Array.isArray(trip.flights)
       ? (trip.flights as Record<string, any>[])
       : [];
-    const updatedFlights = [...existingFlights, flight];
 
+    // Prevent duplicate flights by flightNumber + departureTime
+    const exists = flights.some(
+      (f) =>
+        f.flightNumber === flightData.flightNumber &&
+        f.departureTime === flightData.departureTime
+    );
+    if (exists)
+      return res
+        .status(400)
+        .json({ message: "This flight is already in the trip" });
+
+    // Assign internal UUID
+    const flight = { id: uuidv4(), ...flightData };
     const updatedTrip = await prisma.savedTrip.update({
       where: { id: tripId },
-      data: { flights: updatedFlights },
+      data: { flights: [...flights, flight] },
     });
 
     res.json(updatedTrip);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Could not add flight", error: err });
+  }
+};
+
+// Delete a flight from a trip
+export const deleteFlightFromTrip = async (req: Request, res: Response) => {
+  try {
+    const { tripId, flightId } = req.params;
+
+    const trip = await prisma.savedTrip.findUnique({ where: { id: tripId } });
+    if (!trip) return res.status(404).json({ message: "Trip not found" });
+
+    const flights: Record<string, any>[] = Array.isArray(trip.flights)
+      ? (trip.flights as Record<string, any>[])
+      : [];
+
+    const updatedFlights = flights.filter((f) => f.id !== flightId);
+    if (updatedFlights.length === flights.length)
+      return res.status(404).json({ message: "Flight not found" });
+
+    const updatedTrip = await prisma.savedTrip.update({
+      where: { id: tripId },
+      data: { flights: updatedFlights },
+    });
+
+    res.status(200).json(updatedTrip);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Could not delete flight", error: err });
   }
 };

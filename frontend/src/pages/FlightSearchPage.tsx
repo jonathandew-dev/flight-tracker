@@ -1,153 +1,159 @@
-// src/pages/FlightSearchPage.tsx
-import { useState } from "react";
-import { searchFlights } from "@/api/api";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { v4 as uuidv4 } from "uuid";
+
+import DashboardLayout from "@/components/DashboardLayout";
 import FlightResultCard from "@/components/cards/FlightResultCard";
 import AddToTripModal from "@/components/modals/AddToTripModal";
-import { useSavedTrips } from "@/api/savedTripService";
-
-
-
+import { useSavedTrips, useAddFlightToTrip } from "@/api/savedTripService";
+import { useFlightSearch } from "@/hooks/useFlightSearch";
 import { Flight } from "@/utils/types";
+import Skeleton from "@/components/Skeleton";
+import FlightSearchForm, { FlightFormData } from "@/components/forms/FlightSearchForm";
 
-const FlightSearchPage = () => {
-  const [originLocationCode, setOriginLocationCode] = useState("");
-  const [destinationLocationCode, setDestinationLocationCode] = useState("");
-  const [departureDate, setDepartureDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
-  const [adults, setAdults] = useState(1);
-  const [maxResults, setMaxResults] = useState(5);
+interface FlightWithInternalId extends Flight {
+  internalId: string;
+}
 
+const FlightSearchPage: React.FC = () => {
+  const location = useLocation();
+  const tripIdFromUrl = new URLSearchParams(location.search).get("tripId");
 
-  const [flights, setFlights] = useState<Flight[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
-
-  // --- Backend trips & addFlight mutation ---
   const { data: trips = [] } = useSavedTrips();
-  console.log("Trips Data",trips);
+  const { mutate: addFlightToTrip } = useAddFlightToTrip();
 
-  // --- Search Flights ---
-  const handleSearch = async () => {
-    if (!originLocationCode || !destinationLocationCode || !departureDate) {
-      setError("Please fill in origin, destination, and departure date");
-      return;
+  const { flights, loading, error, search } = useFlightSearch();
+
+  const [flightsWithIds, setFlightsWithIds] = useState<FlightWithInternalId[]>([]);
+  const [selectedFlight, setSelectedFlight] = useState<FlightWithInternalId | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [form, setForm] = useState<FlightFormData>({
+    origin: "",
+    destination: "",
+    departureDate: "",
+    returnDate: "",
+    adults: 1,
+    maxResults: 5,
+  });
+
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(() => {
+    if (tripIdFromUrl && trips.some((t) => t.id === tripIdFromUrl)) {
+      return tripIdFromUrl;
     }
+    return null;
+  });
 
-    setLoading(true);
-    setError("");
-    setFlights([]);
+  // Map flights to include a persistent internalId
+  useEffect(() => {
+    const mappedFlights = flights.map((f) => ({
+      ...f,
+      internalId: f.id || uuidv4(),
+    }));
+    setFlightsWithIds(mappedFlights);
+  }, [flights]);
 
-    try {
-      const results = await searchFlights({
-        originLocationCode,
-        destinationLocationCode,
-        departureDate,
-        returnDate,
-        adults,
-        max: maxResults,
-      });
-      setFlights(results);
-    } catch (err: unknown) {
-      if (err instanceof Error) setError(err.message);
-      else setError("Something went wrong");
-    } finally {
-      setLoading(false);
+  const addFlightToTripWithToast = (tripId: string, flight: Flight) => {
+    addFlightToTrip(
+      { tripId, flight },
+      {
+        onSuccess: () => toast.success("Flight added to trip!"),
+        onError: (err: unknown) => {
+          const message = err instanceof Error ? err.message : "Failed to add flight";
+          toast.error(message);
+        },
+      }
+    );
+  };
+
+  const handleAddFlight = (flight: FlightWithInternalId) => {
+    if (selectedTripId) {
+      addFlightToTripWithToast(selectedTripId, flight);
+    } else {
+      setSelectedFlight(flight);
+      setIsModalOpen(true);
     }
   };
 
-  // --- Open modal for selected flight ---
-  const handleAddToTrip = (flight: Flight) => {
-    setSelectedFlight(flight);
-    setIsModalOpen(true);
-  };
+  const renderFlights = () => {
+    if (loading) return <SkeletonGrid count={form.maxResults} />;
+    if (error) return <p className="text-red-500">{error}</p>;
+    if (flightsWithIds.length === 0)
+      return <p className="text-gray-500">No flights found. Try changing your search.</p>;
 
-  // --- Render ---
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Search Flights</h1>
-
-      {/* --- Search Form --- */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <input
-          type="text"
-          placeholder="Origin"
-          value={originLocationCode}
-          onChange={(e) => setOriginLocationCode(e.target.value)}
-          className="border p-2 rounded"
-        />
-        <input
-          type="text"
-          placeholder="Destination"
-          value={destinationLocationCode}
-          onChange={(e) => setDestinationLocationCode(e.target.value)}
-          className="border p-2 rounded"
-        />
-        <input
-          type="date"
-          value={departureDate}
-          onChange={(e) => setDepartureDate(e.target.value)}
-          className="border p-2 rounded"
-        />
-        <input
-          type="date"
-          value={returnDate}
-          onChange={(e) => setReturnDate(e.target.value)}
-          className="border p-2 rounded"
-        />
-        <input
-          type="number"
-          min={1}
-          value={adults}
-          onChange={(e) => setAdults(Number(e.target.value))}
-          className="border p-2 rounded w-20"
-          placeholder="Adults"
-        />
-        <input
-          type="number"
-          min={1}
-          max={50}
-          value={maxResults}
-          onChange={(e) => setMaxResults(Number(e.target.value))}
-          className="border p-2 rounded w-20"
-          placeholder="Max"
-        />
-        <button
-          onClick={handleSearch}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Search
-        </button>
-      </div>
-
-      {/* --- Loading / Error --- */}
-      {loading && <p>Loading flights...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-
-      {/* --- Flight Results --- */}
+    return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {flights.map((flight) => (
+        {flightsWithIds.map((flight) => (
           <FlightResultCard
-            key={flight.id}
+            key={flight.internalId} // Use persistent internalId
             flight={flight}
-            onAddToTrip={handleAddToTrip}
+            onAddToTrip={() => handleAddFlight(flight)}
           />
         ))}
       </div>
+    );
+  };
 
-      {/* --- Add to Trip Modal --- */}
-      {selectedFlight && (
-        <AddToTripModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          trips={trips}
-          flight={selectedFlight!} // flight is required
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">
+          Search Flights {selectedTripId && "(Adding to Trip)"}
+        </h1>
+
+        <FlightSearchForm
+          form={form}
+          setForm={setForm}
+          onSearch={() =>
+            search({
+              originLocationCode: form.origin,
+              destinationLocationCode: form.destination,
+              departureDate: form.departureDate,
+              returnDate: form.returnDate,
+              adults: form.adults,
+              max: form.maxResults,
+            })
+          }
+          loading={loading}
         />
-      )}
-    </div>
+
+        {renderFlights()}
+
+        {selectedFlight && !selectedTripId && (
+          <AddToTripModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            trips={trips}
+            flight={selectedFlight}
+            selectedTripId={selectedTripId}
+            onSelectTrip={(tripId) => setSelectedTripId(tripId)}
+            handleConfirm={() => {
+              if (selectedTripId && selectedFlight) {
+                addFlightToTripWithToast(selectedTripId, selectedFlight);
+                setIsModalOpen(false);
+                setSelectedTripId(null);
+                setSelectedFlight(null);
+              }
+            }}
+          />
+        )}
+      </div>
+    </DashboardLayout>
   );
 };
+
+const SkeletonGrid: React.FC<{ count: number }> = ({ count }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {Array(count)
+      .fill(0)
+      .map((_, idx) => (
+        <Skeleton
+          key={idx}
+          className="h-48 w-full rounded-xl shadow animate-pulse"
+        />
+      ))}
+  </div>
+);
 
 export default FlightSearchPage;

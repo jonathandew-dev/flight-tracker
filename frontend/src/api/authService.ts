@@ -1,21 +1,10 @@
-import axios from "axios";
+// src/api/authService.ts
 import { useMutation } from "@tanstack/react-query";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore, api } from "@/store/authStore"; // <-- shared Axios
 
-// Axios instance
-export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
-  headers: { "Content-Type": "application/json" },
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("authToken"); // or use store if inside a hook
-  if (!config.headers) config.headers = new axios.AxiosHeaders();
-  if (token) config.headers.set("Authorization", `Bearer ${token}`);
-  return config;
-});
-
+// --------------------
 // Types
+// --------------------
 export interface AuthPayload {
   email: string;
   password: string;
@@ -24,75 +13,97 @@ export interface AuthPayload {
 export interface User {
   id: string;
   email: string;
-  name?: string | null;
+  firstName: string | null;
+  lastName: string | null;
 }
 
+
 export interface AuthResponse {
-  user: User;
+  user: {
+    id: string;
+    email: string;
+    firstName?: string | null;
+    lastName?: string | null;
+  };
   accessToken: string;
   refreshToken: string;
 }
 
+// --------------------
 // React Query hooks
+// --------------------
+
+// Login
 export const useLogin = () => {
-  const setAuth = useAuthStore((state) => state.setAuth);
-
   return useMutation<AuthResponse, Error, AuthPayload>({
-    mutationFn: async (payload: AuthPayload) => {
-      const res = await api.post<AuthResponse>("/auth/login", payload);
-      const { accessToken, user } = res.data;
+    mutationFn: async (payload) => {
+      const { data } = await api.post<AuthResponse>("/auth/login", payload);
 
-      setAuth(accessToken, user); // updates store & localStorage
-      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-      return res.data;
+      // normalize user fields
+      const normalizedUser: User = {
+        ...data.user,
+        firstName: data.user.firstName ?? null,
+        lastName: data.user.lastName ?? null,
+      };
+
+      return {
+        ...data,
+        user: normalizedUser,
+      };
     },
   });
 };
+// Register
 export const useRegister = () => {
-  const setAuth = useAuthStore((state) => state.setAuth);
-
   return useMutation<AuthResponse, Error, AuthPayload>({
-    mutationFn: async (payload: AuthPayload) => {
-      const res = await api.post<AuthResponse>("/auth/register", payload);
-      const { accessToken, user } = res.data;
-
-      setAuth(accessToken, user);
-      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-      return res.data;
+    mutationFn: async (payload) => {
+      const { data } = await api.post<AuthResponse>("/auth/register", payload);
+      return data; // don't call setAuth here
     },
   });
 };
 
-
+// Update User
 export const useUpdateUser = () => {
-  return useMutation<User, Error, { name?: string | null }>({
-    mutationFn: async (data) => {
-      const response = await api.patch<User>("/api/users/me", data);
-      return response.data;
+  const setUser = useAuthStore((state) => state.setUser);
+
+  return useMutation<User, Error, { firstName?: string | null; lastName?: string | null }>({
+    mutationFn: async (payload) => {
+      const { data } = await api.patch<User>("/api/users/me", payload);
+
+      const normalizedUser: User = {
+        ...data,
+        firstName: data.firstName ?? null,
+        lastName: data.lastName ?? null,
+      };
+
+      setUser(normalizedUser);
+      return normalizedUser;
     },
   });
 };
 
-
-// Token management
-export const setAuthToken = (token: string | null, user?: User) => {
-  if (token) {
-    localStorage.setItem("authToken", token);
-    if (user) localStorage.setItem("user", JSON.stringify(user));
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  } else {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-    delete api.defaults.headers.common["Authorization"];
-  }
+// Change Password
+export const useChangePassword = () => {
+  return useMutation<void, Error, { currentPassword: string; newPassword: string }>({
+    mutationFn: async (payload) => {
+      await api.post("/api/users/change-password", payload);
+    },
+  });
 };
+
+// Restore Auth on app load
 export const restoreAuth = () => {
   const token = localStorage.getItem("authToken");
   const userStr = localStorage.getItem("user");
 
   if (token && userStr) {
-    const user = JSON.parse(userStr);
-    useAuthStore.getState().setAuth(token, user); // update Zustand store
-    setAuthToken(token, user);                   // update Axios headers
+    const parsed = JSON.parse(userStr);
+    const user: User = {
+      ...parsed,
+      firstName: parsed.firstName ?? null,
+      lastName: parsed.lastName ?? null,
+    };
+    useAuthStore.getState().setAuth(token, user);
   }
 };

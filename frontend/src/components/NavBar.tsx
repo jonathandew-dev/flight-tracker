@@ -49,7 +49,7 @@ const NavBar: React.FC<{ hideAuthenticatedLinks?: boolean }> = ({ hideAuthentica
   return (
     <nav className="bg-white shadow-md px-4 py-2 flex justify-between items-center">
       {/* Logo always visible */}
-      <Link to="/" className="text-xl font-bold text-blue-600">
+      <Link to="/dashboard" className="text-xl font-bold text-blue-600">
         Flight Tracker
       </Link>
 

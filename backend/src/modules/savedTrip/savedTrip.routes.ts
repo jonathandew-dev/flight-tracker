@@ -16,5 +16,6 @@ router.put('/:id', validate(updateSavedTripSchema), savedTripController.updateSa
 router.delete('/:id', savedTripController.deleteSavedTrip);
 router.post('/:tripId/flights',savedTripController.addFlightToTrip);
 router.put('/:tripId/flights/:flightIndex',savedTripController.updateFlightInTrip);
+router.delete('/:tripId/flights/:flightId', savedTripController.deleteFlightFromTrip);
 
 export default router

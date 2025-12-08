@@ -2,6 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useSavedTrips } from "../api/savedTripService";
+import { useAuthStore } from "@/store/authStore";
 import {
   Card,
   CardHeader,
@@ -12,8 +13,21 @@ import {
 import { Plane, Calendar, Settings, Clock } from "lucide-react";
 import Skeleton from "@/components/Skeleton";
 
+// Helper to display user's name
+const getUserFirstName = (user: {
+  firstName: string | null;
+  email: string;
+}) => {
+  const firstName = user.firstName?.trim();
+  if (firstName) return firstName;
+  return user.email;
+};
+
 const Dashboard: React.FC = () => {
   const { data: trips, isLoading } = useSavedTrips();
+  const user = useAuthStore((state) => state.user);
+
+  if (!user) return null;
 
   const stats = [
     {
@@ -62,7 +76,7 @@ const Dashboard: React.FC = () => {
           {isLoading ? (
             <Skeleton as="span" className="h-8 w-64" />
           ) : (
-            "Welcome back, Jonathan"
+            `Welcome back, ${getUserFirstName(user)}`
           )}
         </h1>
         <div className="text-gray-600">
@@ -150,7 +164,7 @@ const Dashboard: React.FC = () => {
                 >
                   <Clock className="h-5 w-5 text-gray-400" />
                   <span className="text-sm">
-                    Updated trip{" "}
+                    {`${getUserFirstName(user)} updated trip `}
                     <span className="font-medium">
                       {trip.title || "Untitled Trip"}
                     </span>

@@ -11,13 +11,13 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 // GET /users/:id
 export const getUserById = catchAsync(async (req: Request, res: Response) => {
   const user = await userService.getUserById(req.params.id);
-  res.status(200).json({ user });
+  res.status(200).json(user); 
 });
 
 // PUT /users/:id
 export const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const user = await userService.updateUser(req.params.id, req.body);
-  res.status(200).json({ user });
+  const updatedUser = await userService.updateUser(req.params.id, req.body);
+  res.status(200).json(updatedUser); // return directly
 });
 
 // DELETE /users/:id
@@ -27,8 +27,9 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+// PATCH /users/me
 export const updateMe = catchAsync(async (req, res) => {
   const userId = req.userId!;
   const updatedUser = await userService.updateUser(userId, req.body);
-  res.json(updatedUser);
+  res.status(200).json(updatedUser); 
 });

@@ -6,11 +6,18 @@ import { verifyAccessToken } from "../../utils/jwt";
 
 
 // REGISTER
-export const registerUserController = catchAsync(async (req: Request, res: Response,next:NextFunction) => {
-  const user = await registerUser(req.body);
-  const { password, ...userWithoutPassword } = user;
-  res.status(201).json({ user: userWithoutPassword });
-});
+export const registerUserController = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Call service
+    const { user, accessToken, refreshToken } = await registerUser(req.body);
+
+    // Remove password before sending
+    const { password, ...userWithoutPassword } = user;
+
+    // Return same shape as login
+    res.status(201).json({ user: userWithoutPassword, accessToken, refreshToken });
+  }
+);
 
 // LOGIN
 export const loginUserController = catchAsync(async (req: Request, res: Response) => {

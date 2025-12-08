@@ -5,7 +5,10 @@ export const getAllUsers = () => {
 };
 
 export const getUserById = (id: string) => {
-  return prisma.user.findUnique({ where: { id }, include: { savedTrips: true } });
+  return prisma.user.findUnique({
+    where: { id },
+    include: { savedTrips: true },
+  });
 };
 
 /**
@@ -14,11 +17,17 @@ export const getUserById = (id: string) => {
  */
 export const updateUser = (
   id: string,
-  data: { name?: string; email?: string; password?: string }
+  data: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+  }
 ) => {
-  // Filter out undefined fields to prevent accidental null/undefined overwrites
+  // Filter out undefined fields
   const filteredData: typeof data = {};
-  if (data.name !== undefined) filteredData.name = data.name;
+  if (data.firstName !== undefined) filteredData.firstName = data.firstName;
+  if (data.lastName !== undefined) filteredData.lastName = data.lastName;
   if (data.email !== undefined) filteredData.email = data.email;
   if (data.password !== undefined) filteredData.password = data.password;
 

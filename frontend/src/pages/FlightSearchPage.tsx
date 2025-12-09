@@ -1,4 +1,3 @@
-// src/pages/FlightSearchPage.tsx
 import { useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -34,15 +33,17 @@ const FlightSearchPage: React.FC = () => {
     maxResults: 6,
   });
 
-  const [selectedFlight, setSelectedFlight] = useState<FlightWithInternalId | null>(null);
+  const [selectedFlight, setSelectedFlight] =
+    useState<FlightWithInternalId | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(() => {
-    if (tripIdFromUrl && trips.some(t => t.id === tripIdFromUrl)) return tripIdFromUrl;
+    if (tripIdFromUrl && trips.some((t) => t.id === tripIdFromUrl))
+      return tripIdFromUrl;
     return null;
   });
 
   const flightsWithIds = useMemo<FlightWithInternalId[]>(() => {
-    return flights.map(f => ({ ...f, internalId: f.id ?? uuidv4() }));
+    return flights.map((f) => ({ ...f, internalId: f.id ?? uuidv4() }));
   }, [flights]);
 
   const addFlightToTripWithToast = (tripId: string, flight: Flight) => {
@@ -50,8 +51,16 @@ const FlightSearchPage: React.FC = () => {
       { tripId, flight },
       {
         onSuccess: () => toast.success("Flight added to trip!"),
-        onError: err => {
-          const message = isError(err) ? err.message : "Failed to add flight";
+        onError: (err: unknown) => {
+          let message = "Failed to add flight";
+
+          // Check if err is an object with a message property
+          if (typeof err === "object" && err !== null && "message" in err) {
+            message = (err as { message: string }).message;
+          } else if (typeof err === "string") {
+            message = err;
+          }
+
           toast.error(message);
         },
       }
@@ -68,11 +77,12 @@ const FlightSearchPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 space-y-10">
-      <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
+    <div className="max-w-7xl mx-auto px-4 py-10 space-y-10 text-gray-900 dark:text-gray-100">
+      <h1 className="text-3xl md:text-4xl font-bold text-center dark:text-gray-100">
         Search Flights {selectedTripId && "(Adding to Trip)"}
       </h1>
 
+      {/* Search form */}
       <FlightSearchForm
         form={form}
         setForm={setForm}
@@ -89,11 +99,22 @@ const FlightSearchPage: React.FC = () => {
         loading={loading}
       />
 
-      {loading || error || flightsWithIds.length === 0 ? (
+      {/* Flight results */}
+      {loading ? (
         <SkeletonGrid count={form.maxResults} />
+      ) : error ? (
+        <div className="text-red-500 text-center">
+          {typeof error === "object" && error !== null && "message" in error
+            ? (error as { message: string }).message
+            : "Failed to fetch flights"}
+        </div>
+      ) : flightsWithIds.length === 0 ? (
+        <p className="text-center text-gray-500 dark:text-gray-400">
+          No flights found. Try adjusting your search.
+        </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {flightsWithIds.map(flight => (
+          {flightsWithIds.map((flight) => (
             <FlightResultCard
               key={flight.internalId}
               flight={flight}
@@ -103,6 +124,7 @@ const FlightSearchPage: React.FC = () => {
         </div>
       )}
 
+      {/* Add to Trip Modal */}
       {selectedFlight && (
         <AddToTripModal
           isOpen={isModalOpen}
@@ -110,7 +132,7 @@ const FlightSearchPage: React.FC = () => {
           trips={trips}
           flight={selectedFlight}
           selectedTripId={selectedTripId}
-          onSelectTrip={tripId => setSelectedTripId(tripId)}
+          onSelectTrip={(tripId) => setSelectedTripId(tripId)}
           handleConfirm={() => {
             if (selectedTripId && selectedFlight) {
               addFlightToTripWithToast(selectedTripId, selectedFlight);
@@ -124,14 +146,13 @@ const FlightSearchPage: React.FC = () => {
   );
 };
 
-function isError(err: unknown): err is Error {
-  return err instanceof Error;
-}
-
 const SkeletonGrid: React.FC<{ count: number }> = ({ count }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {Array.from({ length: count }).map((_, idx) => (
-      <div key={idx} className="h-56 bg-gray-200 rounded-xl shadow-sm animate-pulse" />
+      <div
+        key={idx}
+        className="h-56 bg-gray-200 dark:bg-gray-700 rounded-xl shadow-sm animate-pulse"
+      />
     ))}
   </div>
 );

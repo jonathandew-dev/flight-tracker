@@ -83,15 +83,13 @@ const TripCard: React.FC<TripCardProps> = ({
   const FlightItem: React.FC<{ flight: Flight }> = ({ flight }) => {
     const airlineName = carriers[flight.airline] || flight.airline;
     return (
-      <div className="bg-gray-50 p-3 rounded-lg shadow-sm flex flex-col gap-2 hover:shadow transition">
-        <div className="flex justify-between items-center text-sm font-medium text-gray-700">
-          <span>
-            {airlineName} {flight.flightNumber}
-          </span>
+      <div className="bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 p-3 rounded-lg flex flex-col gap-2 shadow-sm transition">
+        <div className="flex justify-between items-center text-sm font-medium text-gray-700 dark:text-gray-200">
+          <span>{airlineName} {flight.flightNumber}</span>
           <Button
             onClick={() => flight.id && onDeleteFlight(trip.id, flight.id)}
             variant="danger"
-            className="p-1 hover:bg-red-100 transition"
+            className="p-1 hover:bg-red-100 dark:hover:bg-red-700 transition"
             aria-label={`Delete flight ${flight.flightNumber}`}
             disabled={!flight.id}
           >
@@ -99,22 +97,22 @@ const TripCard: React.FC<TripCardProps> = ({
           </Button>
         </div>
 
-        <div className="flex justify-between items-center text-gray-600 text-sm">
+        <div className="flex justify-between items-center text-gray-600 dark:text-gray-300 text-sm">
           <div className="flex flex-col items-center">
             <PlaneTakeoff className="w-5 h-5 text-blue-500" />
             <span className="font-semibold">{flight.origin}</span>
-            <span className="text-gray-400 text-xs">{formatTime(flight.departureTime)}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-400">{formatTime(flight.departureTime)}</span>
           </div>
           <div className="flex flex-col items-center text-center">
             <Clock className="w-4 h-4 text-gray-400 mb-1" />
-            <span className="text-gray-500 text-xs">
+            <span className="text-xs text-gray-500 dark:text-gray-300">
               {getDuration(flight.departureTime, flight.arrivalTime)}
             </span>
           </div>
           <div className="flex flex-col items-center">
             <PlaneLanding className="w-5 h-5 text-red-500" />
             <span className="font-semibold">{flight.destination}</span>
-            <span className="text-gray-400 text-xs">{formatTime(flight.arrivalTime)}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-400">{formatTime(flight.arrivalTime)}</span>
           </div>
         </div>
       </div>
@@ -122,7 +120,7 @@ const TripCard: React.FC<TripCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-[1.02] flex flex-col p-5 gap-4">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-[1.02] flex flex-col p-5 gap-4 text-gray-900 dark:text-gray-100">
       <div className="flex justify-between items-center mb-4">
         {editingTitle ? (
           <div className="flex gap-2 w-full">
@@ -131,12 +129,12 @@ const TripCard: React.FC<TripCardProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onKeyDown={handleKeyPress}
-              className="border rounded-lg p-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border rounded-lg p-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
               placeholder="Trip Title"
             />
             <Button
               onClick={handleSaveTitle}
-              className="p-2 hover:bg-blue-100 transition"
+              className="p-2 hover:bg-blue-100 dark:hover:bg-blue-600 transition"
               disabled={saving}
               aria-label="Save title"
             >
@@ -144,7 +142,7 @@ const TripCard: React.FC<TripCardProps> = ({
             </Button>
             <Button
               onClick={() => setEditingTitle(false)}
-              className="p-2 hover:bg-gray-100 transition"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 transition"
               aria-label="Cancel edit"
             >
               <X size={16} />
@@ -156,7 +154,7 @@ const TripCard: React.FC<TripCardProps> = ({
             <div className="flex gap-2 items-center">
               <Button
                 onClick={() => setEditingTitle(true)}
-                className="p-2 hover:bg-gray-100 transition"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 transition"
                 aria-label="Edit Trip Title"
               >
                 <Edit size={16} />
@@ -164,7 +162,7 @@ const TripCard: React.FC<TripCardProps> = ({
               <Button
                 onClick={() => onDeleteTrip(trip.id)}
                 variant="danger"
-                className="p-2 hover:bg-red-100 transition"
+                className="p-2 hover:bg-red-100 dark:hover:bg-red-700 transition"
                 aria-label="Delete Trip"
               >
                 <Trash2 size={16} />
@@ -182,11 +180,15 @@ const TripCard: React.FC<TripCardProps> = ({
       </div>
 
       {!collapsed && (
-        <div className="flex flex-col gap-3 mb-4 max-h-72 overflow-y-auto">
+        <div className="flex flex-col gap-3 mb-4 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-200 dark:scrollbar-track-gray-700">
           {trip.flights.length === 0 ? (
-            <p className="text-gray-500 text-sm">No flights added yet.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">No flights added yet.</p>
           ) : (
-            trip.flights.map((f) => <FlightItem key={f.id} flight={f} />)
+            trip.flights.map((f) => (
+              <div key={f.id} className="border-b border-gray-200 dark:border-gray-600 last:border-0">
+                <FlightItem flight={f} />
+              </div>
+            ))
           )}
         </div>
       )}
@@ -194,7 +196,7 @@ const TripCard: React.FC<TripCardProps> = ({
       {onAddFlight && (
         <Button
           onClick={() => onAddFlight(trip.id)}
-          className="flex items-center justify-center gap-2 mt-auto bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition"
+          className="flex items-center justify-center gap-2 mt-auto bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-500 py-2 rounded-lg transition"
           disabled={collapsed}
           aria-disabled={collapsed}
         >

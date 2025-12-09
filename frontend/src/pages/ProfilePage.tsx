@@ -5,6 +5,7 @@ import ProfileForm from "../components/forms/ProfileForm";
 import ChangePasswordForm from "../components/forms/ChangePasswordForm";
 import { useAuthStore } from "../store/authStore";
 import { useUpdateUser, useChangePassword } from "../api/authService";
+import { Button } from "../components/Button";
 
 const ProfilePage: React.FC = () => {
   const { user, logout, setUser } = useAuthStore();
@@ -13,14 +14,9 @@ const ProfilePage: React.FC = () => {
   const updateUser = useUpdateUser();
   const changePassword = useChangePassword();
 
-  // Wrapper for React Query mutation
   const updateUserWrapper = {
     mutateAsync: async (data: { firstName?: string; lastName?: string }) => {
-      console.log("Sending to updateUser:", data);
       const updated = await updateUser.mutateAsync(data);
-      console.log("Returned from API:", updated);
-
-      // Directly set updated user in Zustand
       setUser(updated);
       return updated;
     },
@@ -38,19 +34,21 @@ const ProfilePage: React.FC = () => {
   if (!user) return null;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 flex flex-col gap-6">
-      <h1 className="text-3xl font-bold mb-6 text-center">Profile</h1>
+    <div className="max-w-3xl mx-auto p-6 flex flex-col gap-8 text-gray-900 dark:text-gray-100">
+      <h1 className="text-3xl font-bold text-center">Profile</h1>
 
+      {/* Profile form */}
       <ProfileForm user={user} updateUser={updateUserWrapper} setUser={setUser} />
 
+      {/* Change password */}
       <ChangePasswordForm changePassword={changePassword} />
 
-      <button
-        onClick={handleLogout}
-        className="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
-      >
-        Logout
-      </button>
+      {/* Logout */}
+      <div className="flex justify-center">
+        <Button variant="danger" onClick={handleLogout}>
+          Logout
+        </Button>
+      </div>
     </div>
   );
 };

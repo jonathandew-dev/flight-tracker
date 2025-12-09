@@ -31,8 +31,7 @@ const SavedTripPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (trips) setTripsOrder(trips);
   }, [trips]);
-
-  const handleAddTrip = () => {
+const handleAddTrip = () => {
     const tempTrip: SavedTrip = { id: `temp-${Date.now()}`, title: "New Trip", flights: [] };
     setTripsOrder((prev) => [...prev, tempTrip]);
 
@@ -61,90 +60,87 @@ const SavedTripPage: React.FC = () => {
   };
 
   const handleDeleteTrip = (tripId: string) => {
-  const prevTrips = [...tripsOrder];
+    const prevTrips = [...tripsOrder];
 
-  // Optimistic update
-  setTripsOrder((prev) => prev.filter((t) => t.id !== tripId));
+    setTripsOrder((prev) => prev.filter((t) => t.id !== tripId));
 
-  // Show toast with Undo
-  const toastId = toast(
-    (t) => (
-      <div className="flex justify-between items-center">
-        <span>Trip deleted</span>
-        <button
-          onClick={() => {
-            setTripsOrder(prevTrips); // rollback
-            toast.dismiss(t.id);
-          }}
-          className="text-blue-500 underline ml-4"
-        >
-          Undo
-        </button>
-      </div>
-    ),
-    { duration: 5000 } // 5 seconds to undo
-  );
+    const toastId = toast(
+      (t) => (
+        <div className="flex justify-between items-center text-gray-900 dark:text-gray-100">
+          <span>Trip deleted</span>
+          <button
+            onClick={() => {
+              setTripsOrder(prevTrips);
+              toast.dismiss(t.id);
+            }}
+            className="text-blue-500 underline ml-4"
+          >
+            Undo
+          </button>
+        </div>
+      ),
+      { duration: 5000 }
+    );
 
-  deleteTrip.mutate(tripId, {
-    onError: () => {
-      setTripsOrder(prevTrips); // rollback if server fails
-      toast.error("Failed to delete trip");
-      toast.dismiss(toastId);
-    },
-    onSuccess: () => {
-      toast.dismiss(toastId); // dismiss undo toast after success
-      toast.success("Trip deleted permanently");
-    },
-  });
-};
-const handleDeleteFlight = (tripId: string, flightId?: string) => {
-  if (!flightId) return toast.error("Cannot delete flight: invalid ID");
-
-  const prevTrips = [...tripsOrder];
-
-  // Optimistic update
-  setTripsOrder((prev) =>
-    prev.map((t) =>
-      t.id === tripId
-        ? { ...t, flights: t.flights?.filter((f) => f.id !== flightId) ?? [] }
-        : t
-    )
-  );
-
-  
-  const toastId = toast(
-    (t) => (
-      <div className="flex justify-between items-center">
-        <span>Flight deleted</span>
-        <button
-          onClick={() => {
-            setTripsOrder(prevTrips); 
-            toast.dismiss(t.id);
-          }}
-          className="text-blue-500 underline ml-4"
-        >
-          Undo
-        </button>
-      </div>
-    ),
-    { duration: 5000 } 
-  );
-
-  deleteFlight.mutate(
-    { tripId, flightId },
-    {
+    deleteTrip.mutate(tripId, {
       onError: () => {
         setTripsOrder(prevTrips);
-        toast.error("Failed to delete flight");
+        toast.error("Failed to delete trip");
         toast.dismiss(toastId);
       },
       onSuccess: () => {
-        toast.dismiss(toastId); 
-        toast.success("Flight deleted permanently");
+        toast.dismiss(toastId);
+        toast.success("Trip deleted permanently");
       },
-    }
-  );
-};
+    });
+  };
+
+  const handleDeleteFlight = (tripId: string, flightId?: string) => {
+    if (!flightId) return toast.error("Cannot delete flight: invalid ID");
+
+    const prevTrips = [...tripsOrder];
+
+    setTripsOrder((prev) =>
+      prev.map((t) =>
+        t.id === tripId
+          ? { ...t, flights: t.flights?.filter((f) => f.id !== flightId) ?? [] }
+          : t
+      )
+    );
+
+    const toastId = toast(
+      (t) => (
+        <div className="flex justify-between items-center text-gray-900 dark:text-gray-100">
+          <span>Flight deleted</span>
+          <button
+            onClick={() => {
+              setTripsOrder(prevTrips);
+              toast.dismiss(t.id);
+            }}
+            className="text-blue-500 underline ml-4"
+          >
+            Undo
+          </button>
+        </div>
+      ),
+      { duration: 5000 }
+    );
+
+    deleteFlight.mutate(
+      { tripId, flightId },
+      {
+        onError: () => {
+          setTripsOrder(prevTrips);
+          toast.error("Failed to delete flight");
+          toast.dismiss(toastId);
+        },
+        onSuccess: () => {
+          toast.dismiss(toastId);
+          toast.success("Flight deleted permanently");
+        },
+      }
+    );
+  };
 
   const handleUpdateTripTitle = async (tripId: string, title: string) => {
     const updated = await updateTrip.mutateAsync({ id: tripId, title });
@@ -154,9 +150,9 @@ const handleDeleteFlight = (tripId: string, flightId?: string) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 text-gray-900 dark:text-gray-100">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Saved Trips</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Saved Trips</h1>
         <Button onClick={handleAddTrip} variant="primary" className="flex items-center gap-2">
           <Plus size={16} /> Add Trip
         </Button>
@@ -164,14 +160,19 @@ const handleDeleteFlight = (tripId: string, flightId?: string) => {
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array(3).fill(0).map((_, idx) => (
-            <Skeleton key={idx} className="h-72 w-full rounded-xl shadow animate-pulse" />
-          ))}
+          {Array(3)
+            .fill(0)
+            .map((_, idx) => (
+              <Skeleton
+                key={idx}
+                className="h-72 w-full rounded-xl shadow animate-pulse bg-gray-200 dark:bg-gray-700"
+              />
+            ))}
         </div>
       ) : isError ? (
-        <div className="text-red-500 text-center">{(error as Error).message}</div>
+        <div className="text-red-500 dark:text-red-400 text-center">{(error as Error).message}</div>
       ) : tripsOrder.length === 0 ? (
-        <div className="text-center text-gray-500 mt-12 space-y-2">
+        <div className="text-center text-gray-500 dark:text-gray-400 mt-12 space-y-2">
           <p>No saved trips yet.</p>
           <p>Click "Add Trip" to create your first trip.</p>
         </div>

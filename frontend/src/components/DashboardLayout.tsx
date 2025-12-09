@@ -13,9 +13,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   hideAuthenticatedLinks,
 }) => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
       <NavBar hideAuthenticatedLinks={hideAuthenticatedLinks} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 p-4 md:p-8 overflow-auto">{children}</main>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import AppRoutes from "./routes/AppRoutes";
 import { Toaster } from "react-hot-toast";
 import { restoreAuth } from "@/store/authStore";
 
+
 restoreAuth(); 
 
 const App: React.FC = () => {

@@ -1,5 +1,3 @@
-// src/components/DashboardLayout.tsx
-// src/components/DashboardLayout.tsx
 import React from "react";
 import NavBar from "./NavBar";
 

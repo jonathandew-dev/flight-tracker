@@ -48,12 +48,26 @@ const FlightResultCard: React.FC<FlightResultCardProps> = ({
   const carrierName = carriers[airline] || airline;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg p-5 flex flex-col gap-4 transition-transform hover:scale-[1.02] text-gray-900 dark:text-gray-100">
+    <div className="
+      bg-white dark:bg-gray-800 
+      rounded-xl shadow-sm hover:shadow-lg 
+      p-5 flex flex-col gap-4 
+      transition-all duration-200 
+      hover:scale-[1.015]
+      text-gray-900 dark:text-gray-100
+      border border-gray-200 dark:border-gray-700
+    ">
       {/* Header */}
       <div
-        className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700 rounded-t-xl px-3 py-2 bg-gray-50 dark:bg-gray-700"
+        className="
+          flex justify-between items-center 
+          pb-3 border-b 
+          border-gray-200 dark:border-gray-700 
+          rounded-t-xl px-3 py-2 
+          bg-gray-50 dark:bg-gray-800
+        "
       >
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
+        <h3 className="font-semibold text-lg">
           {carrierName} {flightNumber}
         </h3>
         <span className="font-bold text-blue-600 dark:text-blue-400">
@@ -62,10 +76,10 @@ const FlightResultCard: React.FC<FlightResultCardProps> = ({
       </div>
 
       {/* Route: Departure → Duration → Arrival */}
-      <div className="flex justify-between items-center mt-3 text-gray-700 dark:text-gray-200">
+      <div className="flex justify-between items-center mt-3">
         {/* Departure */}
         <div className="flex flex-col items-center group">
-          <PlaneTakeoff className="w-6 h-6 text-blue-500 transition-transform group-hover:-translate-y-1" />
+          <PlaneTakeoff className="w-6 h-6 text-blue-500 dark:text-blue-400 transition-transform group-hover:-translate-y-1" />
           <span className="font-semibold text-lg mt-1">{origin}</span>
           <span className="text-gray-500 dark:text-gray-400 text-sm">
             {formatTime(departureTime)}
@@ -81,14 +95,24 @@ const FlightResultCard: React.FC<FlightResultCardProps> = ({
           <span className="text-gray-600 dark:text-gray-300 text-sm">
             {getDuration(departureTime, arrivalTime)}
           </span>
-          <span className="absolute bottom-full mb-2 px-2 py-1 text-xs rounded bg-gray-800 dark:bg-gray-600 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+
+          {/* Tooltip */}
+          <span className="
+            absolute bottom-full mb-2 px-2 py-1 
+            text-xs rounded 
+            bg-gray-900 dark:bg-gray-700 
+            text-white 
+            opacity-0 group-hover:opacity-100 
+            transition-opacity
+            pointer-events-none
+          ">
             Flight duration
           </span>
         </div>
 
         {/* Arrival */}
         <div className="flex flex-col items-center group">
-          <PlaneLanding className="w-6 h-6 text-red-500 transition-transform group-hover:-translate-y-1" />
+          <PlaneLanding className="w-6 h-6 text-red-500 dark:text-red-400 transition-transform group-hover:-translate-y-1" />
           <span className="font-semibold text-lg mt-1">{destination}</span>
           <span className="text-gray-500 dark:text-gray-400 text-sm">
             {formatTime(arrivalTime)}
@@ -102,7 +126,14 @@ const FlightResultCard: React.FC<FlightResultCardProps> = ({
       {/* Add to Trip Button */}
       <Button
         onClick={() => onAddToTrip(flight)}
-        className="mt-4 w-full flex justify-center items-center gap-2 bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white py-2 rounded-lg transition-shadow hover:shadow-md"
+        className="
+          mt-4 w-full 
+          flex justify-center items-center gap-2 
+          bg-blue-500 dark:bg-blue-600 
+          hover:bg-blue-600 dark:hover:bg-blue-700 
+          text-white py-2 rounded-lg 
+          transition-shadow hover:shadow-md
+        "
         aria-label={`Add flight ${carrierName} ${flightNumber} to trip`}
       >
         Add to Trip

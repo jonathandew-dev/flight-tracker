@@ -8,7 +8,7 @@ import {
   X,
   Save,
   ChevronDown,
-  ChevronUp,
+  
   PlaneTakeoff,
   PlaneLanding,
   Clock,
@@ -124,14 +124,16 @@ const TripCard: React.FC<TripCardProps> = ({
       <div className="flex justify-between items-center mb-4">
         {editingTitle ? (
           <div className="flex gap-2 w-full">
-            <input
-              ref={inputRef}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={handleKeyPress}
-              className="border rounded-lg p-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-              placeholder="Trip Title"
-            />
+             <input
+    ref={inputRef}
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+    onKeyDown={handleKeyPress}
+    className={`border rounded-lg p-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 ${
+      trip.id.startsWith("temp-") ? "max-w-[150px]" : ""
+    }`}
+    placeholder="Trip Title"
+  />
             <Button
               onClick={handleSaveTitle}
               className="p-2 hover:bg-blue-100 dark:hover:bg-blue-600 transition"
@@ -168,12 +170,12 @@ const TripCard: React.FC<TripCardProps> = ({
                 <Trash2 size={16} />
               </Button>
               <Button
-                onClick={() => setCollapsed(!collapsed)}
-                className={`p-2 transition-transform ${collapsed ? "rotate-180" : ""}`}
-                aria-label={collapsed ? "Expand Flights" : "Collapse Flights"}
-              >
-                {collapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-              </Button>
+  onClick={() => setCollapsed(!collapsed)}
+  className={`p-2 transition-transform ${collapsed ? "" : "rotate-180"}`}
+  aria-label={collapsed ? "Expand Flights" : "Collapse Flights"}
+>
+  <ChevronDown size={16} />
+</Button>
             </div>
           </>
         )}

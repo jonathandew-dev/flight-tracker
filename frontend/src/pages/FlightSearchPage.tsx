@@ -28,17 +28,15 @@ const FlightSearchPage: React.FC = () => {
     origin: "",
     destination: "",
     departureDate: "",
-    returnDate: undefined,
+    returnDate: "",
     adults: 1,
     maxResults: 6,
   });
 
-  const [selectedFlight, setSelectedFlight] =
-    useState<FlightWithInternalId | null>(null);
+  const [selectedFlight, setSelectedFlight] = useState<FlightWithInternalId | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(() => {
-    if (tripIdFromUrl && trips.some((t) => t.id === tripIdFromUrl))
-      return tripIdFromUrl;
+    if (tripIdFromUrl && trips.some((t) => t.id === tripIdFromUrl)) return tripIdFromUrl;
     return null;
   });
 
@@ -53,14 +51,9 @@ const FlightSearchPage: React.FC = () => {
         onSuccess: () => toast.success("Flight added to trip!"),
         onError: (err: unknown) => {
           let message = "Failed to add flight";
-
-          // Check if err is an object with a message property
-          if (typeof err === "object" && err !== null && "message" in err) {
+          if (err && typeof err === "object" && "message" in err) {
             message = (err as { message: string }).message;
-          } else if (typeof err === "string") {
-            message = err;
-          }
-
+          } else if (typeof err === "string") message = err;
           toast.error(message);
         },
       }
@@ -68,30 +61,34 @@ const FlightSearchPage: React.FC = () => {
   };
 
   const handleAddFlight = (flight: FlightWithInternalId) => {
-    if (selectedTripId) {
-      addFlightToTripWithToast(selectedTripId, flight);
-    } else {
+    if (selectedTripId) addFlightToTripWithToast(selectedTripId, flight);
+    else {
       setSelectedFlight(flight);
       setIsModalOpen(true);
     }
   };
 
+  const getErrorMessage = (err: unknown) => {
+    if (err && typeof err === "object" && "message" in err) return (err as { message: string }).message;
+    if (typeof err === "string") return err;
+    return "Failed to fetch flights";
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 space-y-10 text-gray-900 dark:text-gray-100">
-      <h1 className="text-3xl md:text-4xl font-bold text-center dark:text-gray-100">
+    <div className="max-w-7xl mx-auto px-4 py-10 space-y-8 text-gray-900 dark:text-gray-100">
+      <h1 className="text-3xl md:text-4xl font-bold text-center">
         Search Flights {selectedTripId && "(Adding to Trip)"}
       </h1>
 
-      {/* Search form */}
       <FlightSearchForm
         form={form}
         setForm={setForm}
-        onSearch={(validatedForm: FlightSearchFormData) =>
+        onSearch={(validatedForm) =>
           search({
             originLocationCode: validatedForm.origin,
             destinationLocationCode: validatedForm.destination,
             departureDate: validatedForm.departureDate,
-            returnDate: validatedForm.returnDate,
+            returnDate: validatedForm.returnDate || undefined,
             adults: validatedForm.adults,
             max: validatedForm.maxResults,
           })
@@ -99,32 +96,24 @@ const FlightSearchPage: React.FC = () => {
         loading={loading}
       />
 
-      {/* Flight results */}
+      {/* Main content */}
       {loading ? (
         <SkeletonGrid count={form.maxResults} />
       ) : error ? (
-        <div className="text-red-500 text-center">
-          {typeof error === "object" && error !== null && "message" in error
-            ? (error as { message: string }).message
-            : "Failed to fetch flights"}
-        </div>
+        <div className="text-red-500 text-center">{getErrorMessage(error)}</div>
       ) : flightsWithIds.length === 0 ? (
         <p className="text-center text-gray-500 dark:text-gray-400">
           No flights found. Try adjusting your search.
         </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {flightsWithIds.map((flight) => (
-            <FlightResultCard
-              key={flight.internalId}
-              flight={flight}
-              onAddToTrip={() => handleAddFlight(flight)}
-            />
+            <FlightResultCard key={flight.internalId} flight={flight} onAddToTrip={() => handleAddFlight(flight)} />
           ))}
         </div>
       )}
 
-      {/* Add to Trip Modal */}
+      {/* Add to trip modal */}
       {selectedFlight && (
         <AddToTripModal
           isOpen={isModalOpen}
@@ -132,7 +121,7 @@ const FlightSearchPage: React.FC = () => {
           trips={trips}
           flight={selectedFlight}
           selectedTripId={selectedTripId}
-          onSelectTrip={(tripId) => setSelectedTripId(tripId)}
+          onSelectTrip={setSelectedTripId}
           handleConfirm={() => {
             if (selectedTripId && selectedFlight) {
               addFlightToTripWithToast(selectedTripId, selectedFlight);
@@ -147,7 +136,7 @@ const FlightSearchPage: React.FC = () => {
 };
 
 const SkeletonGrid: React.FC<{ count: number }> = ({ count }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {Array.from({ length: count }).map((_, idx) => (
       <div
         key={idx}

@@ -2,8 +2,6 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "moduleResolution": "node",
-    "target": "ESNext",
-    "module": "ESNext",
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
@@ -12,5 +10,5 @@
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "prisma/**/*.ts", "prisma.config.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/__tests__/*"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/__tests__/*", "**/*.mock.ts", "**/jest.*.ts"]
 }

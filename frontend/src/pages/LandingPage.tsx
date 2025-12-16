@@ -52,12 +52,9 @@ const LandingPage: React.FC = () => {
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-white p-6 rounded shadow">
             <p>"Flight Tracker has made my travel planning so much easier! Highly recommend."</p>
-            <span className="block mt-4 font-bold">– Alex P.</span>
+            <span className="block mt-4 font-bold">– Allison D.</span>
           </div>
-          <div className="bg-white p-6 rounded shadow">
-            <p>"I never have to worry about missing a flight or losing track of my trips."</p>
-            <span className="block mt-4 font-bold">– Sarah W.</span>
-          </div>
+         
         </div>
       </section>
 

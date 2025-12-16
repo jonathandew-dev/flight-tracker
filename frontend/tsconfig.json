@@ -2,6 +2,8 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "moduleResolution": "bundler",
+      "outDir": "dist",
+
     "jsx": "react-jsx",
     "types": ["vite/client", "react"],
     "baseUrl": "./",

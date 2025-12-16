@@ -7,8 +7,16 @@
     "dev:backend": "tsx watch backend/src/server.ts",
     "dev:frontend": "vite --config frontend/vite.config.ts",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+
+
     "build:frontend": "tsc -b && vite build --config frontend/vite.config.ts",
     "preview:frontend": "vite preview --config frontend/vite.config.ts",
+
+
+      
+  "build:backend": "tsc --project backend/tsconfig.json",
+  "start:backend": "node backend/dist/server.js",
+
     "lint": "eslint .",
     "prisma:generate": "prisma generate --schema ./backend/prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev --schema ./backend/prisma/schema.prisma",

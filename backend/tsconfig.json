@@ -2,7 +2,8 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "moduleResolution": "node",
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "outDir": "dist",
   },
   "include": ["src/**/*.ts", "prisma/**/*.ts", "prisma.config.ts"]
 }

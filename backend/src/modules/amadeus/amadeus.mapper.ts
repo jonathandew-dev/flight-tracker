@@ -25,6 +25,7 @@ export function mapAmadeusFlightOffer(offer: FlightOffer): Flight {
     origin: segment.departure.iataCode,
     destination: segment.arrival.iataCode,
     departureTime: segment.departure.at,
+    
     arrivalTime: segment.arrival.at,
     price: convertPriceToUSD(offer.price),
   };

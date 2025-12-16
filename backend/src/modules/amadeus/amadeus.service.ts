@@ -1,6 +1,7 @@
 import axios from "axios";
 import ApiError from "../../utils/ApiError";
-import { FlightOffer } from "./amadeus.types";
+import { Flight } from "./amadeus.types";
+
 
 import { mapAmadeusFlightOffers } from "./amadeus.mapper";
 
@@ -48,7 +49,7 @@ export const searchFlights = async (
   returnDate?: string,
   adults = 1,
   max = 5
-): Promise<FlightOffer[]> => {
+): Promise<Flight[]> => {
   const token = await getAccessToken();
 
   const params: any = {

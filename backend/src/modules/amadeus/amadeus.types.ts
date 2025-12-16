@@ -38,3 +38,14 @@ export interface FlightOffer {
     booking: string;             // link to booking page if available
   };
 }
+
+export interface Flight {
+  id: string;
+  airline: string;
+  flightNumber: string;
+  origin: string;
+  destination: string;
+  departureTime: string;
+  arrivalTime: string;
+  price: Price;
+}

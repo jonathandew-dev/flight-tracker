@@ -62,9 +62,7 @@ export const searchFlights = async (
 
   if (returnDate) params.returnDate = returnDate;
 
-  // --- LOGGING: inspect request ---
-  console.log("Amadeus request params:", params);
-  console.log("Token exists?", !!token);
+  
 
   try {
     const response = await axios.get(
@@ -75,8 +73,7 @@ export const searchFlights = async (
       }
     );
 
-    // --- LOGGING: inspect raw Amadeus response ---
-    console.log("Amadeus raw response data:", response.data);
+
 
     const rawOffers = response.data.data;
     if (!rawOffers || !Array.isArray(rawOffers)) {
@@ -85,8 +82,8 @@ export const searchFlights = async (
 
     return mapAmadeusFlightOffers(rawOffers);
   } catch (err: any) {
-    // --- LOGGING: capture the exact API error ---
-    console.error("Amadeus API error:", err.response?.data || err.message);
+    
+    
     throw err;
   }
 };

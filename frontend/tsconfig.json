@@ -3,6 +3,7 @@
   "compilerOptions": {
     "moduleResolution": "bundler",
       "outDir": "dist",
+      "rootDir": "src",
 
     "jsx": "react-jsx",
     "types": ["vite/client", "react"],

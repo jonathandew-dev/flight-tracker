@@ -2,7 +2,7 @@
 import React, { useContext } from "react";
 import { Sun, Moon, LogOut } from "lucide-react";
 import { ThemeContext } from "@/context/ThemeContext";
-import { useAuthStore } from "../store/authStore";
+import { useAuthStore } from "../store/authStore.js";
 import { useNavigate } from "react-router-dom";
 
 const ActionButtons: React.FC = () => {

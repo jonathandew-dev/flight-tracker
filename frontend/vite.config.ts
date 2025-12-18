@@ -4,12 +4,25 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig({
-  root: path.resolve(__dirname,), 
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src")
-    },
-    extensions: [".js", ".ts", ".jsx", ".tsx", ".json"]
+    }
+  },
+  server: {
+    port: 5173,
+    open: true,
+    proxy: {
+      "/api": {
+        target: process.env.VITE_API_URL,
+        changeOrigin: true,
+        secure: true,
+      }
+    }
+  },
+  build: {
+    outDir: "dist",
+    sourcemap: true
   }
 });

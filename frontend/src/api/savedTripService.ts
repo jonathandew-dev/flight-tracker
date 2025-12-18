@@ -1,6 +1,6 @@
 // src/api/savedTripService.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SavedTrip, Flight } from "../utils/types";
+import { SavedTrip, Flight } from "../utils/types.js";
 import { useAuthStore, api } from "@/store/authStore";
 
 // --------------------

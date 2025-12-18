@@ -6,7 +6,7 @@
 [build.environment]
   NODE_VERSION = "20"
   # Example environment variable:
-  # VITE_API_URL = 
+  # VITE_API_URL = https://flight-tracker-50qa.onrender.com/
 
 [[redirects]]
   from = "/*"

@@ -1,5 +1,5 @@
 // src/seed.ts
-import { prisma } from './config/db.ts';
+import { prisma } from './config/db.js';
 ;
 
 async function main() {

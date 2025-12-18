@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { registerUser, loginUser } from "./auth.service";
-import { catchAsync } from "../../utils/catchAsync";
-import { getUserById } from "../user/user.service";
-import { verifyAccessToken } from "../../utils/jwt";
+import { registerUser, loginUser } from "./auth.service.js";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { getUserById } from "../user/user.service.js";
+import { verifyAccessToken } from "../../utils/jwt.js";
 
 
 // REGISTER

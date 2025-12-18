@@ -1,9 +1,9 @@
 // src/modules/savedTrip/savedTripRoutes.ts
 import { Router } from 'express'
-import * as savedTripController from './savedTrip.controller'
-import { authMiddleware } from '../../middleware/auth'
-import { validate } from '../../middleware/validate'
-import { createSavedTripSchema,updateSavedTripSchema } from './savedTrip.validators'
+import * as savedTripController from "./savedTrip.controller.js"
+import { authMiddleware } from "../../middleware/auth.js"
+import { validate } from "../../middleware/validate.js"
+import { createSavedTripSchema,updateSavedTripSchema } from "./savedTrip.validators.js"
 
 const router = Router()
 

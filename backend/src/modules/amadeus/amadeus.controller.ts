@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { catchAsync } from "../../utils/catchAsync";
-import { searchFlights } from "./amadeus.service";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { searchFlights } from "./amadeus.service.js";
 
 
 

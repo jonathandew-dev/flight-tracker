@@ -1,4 +1,4 @@
-import { prisma } from "../../config/db";
+import { prisma } from "../../config/db.js";
 
 export const getAllUsers = () => {
   return prisma.user.findMany({ include: { savedTrips: true } });

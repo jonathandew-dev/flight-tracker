@@ -1,12 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
-import { catchAsync } from '../../utils/catchAsync';
-import * as savedTripService from './savedTrip.service';
-import {prisma} from '../../config/db'
-import {Prisma} from '../../generated/client';
-import { v4 as uuidv4 } from 'uuid';
-
+import { Request, Response } from "express";
+import { catchAsync } from "../../utils/catchAsync.js";
+import * as savedTripService from "./savedTrip.service.js";
+import { prisma } from "../../config/db.js";
+import type { Prisma } from "@prisma/client";
+import { v4 as uuidv4 } from "uuid";
 // POST /savedTrips
-export const createSavedTrip = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const createSavedTrip = catchAsync(async (req: Request, res: Response, next: Function) => {
   const tripData: Prisma.SavedTripCreateInput = {
     title: req.body.title ?? null,
     user: { connect: { id: req.userId! } },
@@ -18,25 +17,25 @@ export const createSavedTrip = catchAsync(async (req: Request, res: Response, ne
 });
 
 // GET /savedTrips
-export const getAllSavedTrips = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const getAllSavedTrips = catchAsync(async (req: Request, res: Response, next: Function) => {
   const trips = await savedTripService.getAllSavedTrips(req.userId!);
   res.status(200).json( trips );
 });
 
 // GET /savedTrips/:id
-export const getSavedTripById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const getSavedTripById = catchAsync(async (req: Request, res: Response, next: Function) => {
   const trip = await savedTripService.getSavedTripById(req.params.id, req.userId!);
   res.status(200).json({ trip });
 });
 
 // PUT /savedTrips/:id
-export const updateSavedTrip = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const updateSavedTrip = catchAsync(async (req: Request, res: Response, next: Function) => {
   const trip = await savedTripService.updateSavedTrip(req.params.id, req.body, req.userId!);
   res.status(200).json({ trip });
 });
 
 // DELETE /savedTrips/:id
-export const deleteSavedTrip = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const deleteSavedTrip = catchAsync(async (req: Request, res: Response, next: Function) => {
   await savedTripService.deleteSavedTrip(req.params.id, req.userId!);
   res.status(204).send();
 });

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import * as userService from "./user.service";
-import { catchAsync } from "../../utils/catchAsync";
+import * as userService from "./user.service.js";
+import { catchAsync } from "../../utils/catchAsync.js";
 
 // GET /users
 export const getAllUsers = catchAsync(async (req: Request, res: Response) => {

@@ -1,9 +1,9 @@
 import axios from "axios";
-import ApiError from "../../utils/ApiError";
-import { Flight } from "./amadeus.types";
+import ApiError from "../../utils/ApiError.js";
+import { Flight } from "./amadeus.types.js";
 
 
-import { mapAmadeusFlightOffers } from "./amadeus.mapper";
+import { mapAmadeusFlightOffers } from "./amadeus.mapper.js";
 
 const AMADEUS_CLIENT_ID = process.env.AMADEUS_CLIENT_ID!;
 const AMADEUS_CLIENT_SECRET = process.env.AMADEUS_CLIENT_SECRET!;

@@ -1,4 +1,4 @@
-import { FlightOffer } from "./amadeus.types";
+import { FlightOffer } from "./amadeus.types.js";
 
 export interface Flight {
   id: string;

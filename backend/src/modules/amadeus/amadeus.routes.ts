@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { searchFlightsHandler } from "./amadeus.controller";
+import { searchFlightsHandler } from "./amadeus.controller.js";
 
 const router = Router();
 

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 
-import ApiError from '../utils/ApiError'
-import { verifyAccessToken } from '../utils/jwt' 
+import ApiError from "../utils/ApiError.js"
+import { verifyAccessToken } from "../utils/jwt.js" 
 
 declare global {
   namespace Express {

@@ -1,19 +1,20 @@
-import "dotenv/config";  // load env first
-import app from "./app.js";
-import { prisma } from "./config/db.js";
+// src/server.ts
+import "dotenv/config"; // must be first to load env vars
+import app from "./app.js"; // your Express app
+import { prisma } from "./config/db.js"; // your Prisma client
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 1000;
 
-const server = app;
-
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 
 const shutdown = async () => {
   console.log("Shutting down server...");
   await prisma.$disconnect();
-  process.exit(0);
+  server.close(() => {
+    process.exit(0);
+  });
 };
 
 process.on("SIGINT", shutdown);

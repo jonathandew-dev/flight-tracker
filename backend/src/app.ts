@@ -4,11 +4,11 @@ import helmet from 'helmet';
 import cors from 'cors';
 
 
-import authRoutes from "./modules/auth/auth.routes";
-import userRoutes from "./modules/user/user.routes";
-import savedTripRoutes from './modules/savedTrip/savedTrip.routes';
-import amadeusRoutes from "./modules/amadeus/amadeus.routes";
-import { errorHandler } from "./middleware/errorHandler";
+import authRoutes from "./modules/auth/auth.routes.js";
+import userRoutes from "./modules/user/user.routes.js";
+import savedTripRoutes from "./modules/savedTrip/savedTrip.routes.js";
+import amadeusRoutes from "./modules/amadeus/amadeus.routes.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 
 const app: Application = express();

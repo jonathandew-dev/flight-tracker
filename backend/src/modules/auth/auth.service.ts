@@ -1,8 +1,8 @@
 // src/modules/auth/auth.service.ts
 import bcrypt from "bcrypt";
-import { prisma } from "../../config/db";
-import ApiError from "../../utils/ApiError";
-import { signAccessToken, signRefreshToken } from "../../utils/jwt";
+import { prisma } from "../../config/db.js";
+import ApiError from "../../utils/ApiError.js";
+import { signAccessToken, signRefreshToken } from "../../utils/jwt.js";
 
 const SALT_ROUNDS = 10;
 

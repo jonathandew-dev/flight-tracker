@@ -1,0 +1,14 @@
+[build]
+  base = "."          # frontend folder is base
+  publish = "dist"    # Vite output
+  command = "npm run build:frontend"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Example environment variable:
+  # VITE_API_URL = 
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

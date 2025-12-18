@@ -1,5 +1,5 @@
 [build]
-  base = "."          # frontend folder is base
+  base = "frontend"          # frontend folder is base
   publish = "dist"    # Vite output
   command = "npm run build:frontend"
 

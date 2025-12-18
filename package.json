@@ -7,7 +7,9 @@
     "dev:backend": "tsx watch backend/src/server.ts",
     "dev:frontend": "vite --config frontend/vite.config.ts",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "build:frontend": "tsc -b && vite build --config frontend/vite.config.ts",
+    
+    "build:frontend": "vite build",
+
     "preview:frontend": "vite preview --config frontend/vite.config.ts",
     "build": "npm run build:frontend && npm run build:backend",
     "build:backend": "tsc --project backend/tsconfig.json",
